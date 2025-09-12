@@ -95,7 +95,7 @@ export const RegisterPage: React.FC = () => {
             // Redirect to login page on success
             window.location.href = '/login';
         } catch (error: unknown) {
-            logger.error('Registration failed:', error as Error);
+            logger.error('Registration', 'Registration failed', error as Error);
 
             let errorMessage = 'Registration failed. Please try again.';
             if (error && typeof error === 'object' && 'code' in error) {
@@ -125,31 +125,38 @@ export const RegisterPage: React.FC = () => {
 
     return (
         <Layout title="Register - EPLQ">
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center py-8 sm:py-12 sm:px-6 lg:px-8">
-                <div className="max-w-md w-full">
+            <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 flex items-center justify-center py-8 sm:py-12 sm:px-6 lg:px-8">
+                {/* Background decorative elements */}
+                <div className="absolute top-20 right-20 w-40 h-40 bg-blue-200/30 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-20 left-20 w-60 h-60 bg-emerald-200/30 rounded-full blur-3xl"></div>
+                <div className="absolute top-1/3 right-1/3 w-80 h-80 bg-purple-200/20 rounded-full blur-3xl"></div>
+                
+                <div className="max-w-lg w-full relative">
                     {/* Logo/brand Section */}
                     <div className="text-center mb-6 sm:mb-8">
-                        <div className="mx-auto h-14 w-14 sm:h-16 sm:w-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                           <span className="text-white text-xl sm:text-2xl font-bold">E</span> 
+                        <div className="mx-auto h-20 w-20 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-2 border-black">
+                           <span className="text-black text-3xl font-black tracking-wider">E</span> 
                         </div>
-                        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
-                        <p className="text-gray-600 text-sm sm:text-base">Join EPLQ for secure location queries</p>
+                        <h2 className="text-4xl font-black text-black mb-2 tracking-tight">CREATE VAULT</h2>
+                        <p className="text-gray-700 text-lg font-medium">Join EPLQ for secure location queries</p>
                     </div>
                     
                     {/* Register Form Card */}
-                    <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 sm:p-8">
+                    <div className="bg-white rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] border-2 border-black p-6 sm:p-8">
                         {/* Registration Form */}
-                        <form onSubmit={handleRegister} className="space-y-4">
+                        <form onSubmit={handleRegister} className="space-y-6">
                             {error && (
-                                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center space-x-2 mb-4">
-                                    <span>❌</span>
-                                    <span className="text-sm">{error}</span>
+                                <div className="mb-6 rounded-xl bg-red-100 border-2 border-red-500 text-red-800 px-4 py-3 text-sm font-medium shadow-[3px_3px_0px_0px_rgba(220,38,38,1)]">
+                                    <div className="flex items-center space-x-2">
+                                        <span>⚠️</span>
+                                        <span>{error}</span>
+                                    </div>
                                 </div>
                             )}
                             
                             {/* Full Name */}
                             <div>
-                                <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label htmlFor="displayName" className="block text-sm font-black text-black mb-3 uppercase tracking-wide">
                                     Full Name *
                                 </label>
                                 <input 
@@ -157,7 +164,7 @@ export const RegisterPage: React.FC = () => {
                                     name="displayName"
                                     type="text"
                                     required
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 placeholder-gray-400 text-sm sm:text-base"
+                                    className="w-full px-4 py-3.5 text-base border-2 border-black rounded-lg shadow-[2.5px_3px_0px_0px_rgba(0,0,0,1)] outline-none transition-all duration-200 ease-in-out focus:shadow-[5.5px_7px_0px_0px_rgba(0,0,0,1)] focus:border-black bg-white text-black placeholder-gray-500 font-medium"
                                     placeholder="Enter your full name"
                                     value={form.displayName}
                                     onChange={handleInputChange}
@@ -166,7 +173,7 @@ export const RegisterPage: React.FC = () => {
 
                             {/* Email */}
                             <div>
-                                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label htmlFor="email" className="block text-sm font-black text-black mb-3 uppercase tracking-wide">
                                     Email Address *
                                 </label>
                                 <input
@@ -175,7 +182,7 @@ export const RegisterPage: React.FC = () => {
                                     type="email"
                                     autoComplete="email"
                                     required
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 placeholder-gray-400 text-sm sm:text-base"
+                                    className="w-full px-4 py-3.5 text-base border-2 border-black rounded-lg shadow-[2.5px_3px_0px_0px_rgba(0,0,0,1)] outline-none transition-all duration-200 ease-in-out focus:shadow-[5.5px_7px_0px_0px_rgba(0,0,0,1)] focus:border-black bg-white text-black placeholder-gray-500 font-medium"
                                     placeholder="Enter your email address"
                                     value={form.email}
                                     onChange={handleInputChange}
@@ -184,7 +191,7 @@ export const RegisterPage: React.FC = () => {
                             
                             {/* Password */}
                             <div>
-                                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label htmlFor="password" className="block text-sm font-black text-black mb-3 uppercase tracking-wide">
                                     Password *
                                 </label>
                                 <input 
@@ -193,7 +200,7 @@ export const RegisterPage: React.FC = () => {
                                     type="password"
                                     autoComplete="new-password"
                                     required
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 placeholder-gray-400 text-sm sm:text-base"
+                                    className="w-full px-4 py-3.5 text-base border-2 border-black rounded-lg shadow-[2.5px_3px_0px_0px_rgba(0,0,0,1)] outline-none transition-all duration-200 ease-in-out focus:shadow-[5.5px_7px_0px_0px_rgba(0,0,0,1)] focus:border-black bg-white text-black placeholder-gray-500 font-medium"
                                     placeholder="Create a password (min 8 characters)"
                                     value={form.password}
                                     onChange={handleInputChange}
@@ -202,7 +209,7 @@ export const RegisterPage: React.FC = () => {
 
                             {/* Confirm Password */}
                             <div>
-                                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label htmlFor="confirmPassword" className="block text-sm font-black text-black mb-3 uppercase tracking-wide">
                                     Confirm Password *
                                 </label>
                                 <input 
@@ -211,7 +218,7 @@ export const RegisterPage: React.FC = () => {
                                     type="password"
                                     autoComplete="new-password"
                                     required
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 placeholder-gray-400 text-sm sm:text-base"
+                                    className="w-full px-4 py-3.5 text-base border-2 border-black rounded-lg shadow-[2.5px_3px_0px_0px_rgba(0,0,0,1)] outline-none transition-all duration-200 ease-in-out focus:shadow-[5.5px_7px_0px_0px_rgba(0,0,0,1)] focus:border-black bg-white text-black placeholder-gray-500 font-medium"
                                     placeholder="Re-enter your password"
                                     value={form.confirmPassword}
                                     onChange={handleInputChange}
@@ -219,49 +226,61 @@ export const RegisterPage: React.FC = () => {
                             </div>
 
                             {/* Privacy Level */}
-                            <div>
-                                <label htmlFor="privacyLevel" className="block text-sm font-medium text-gray-700 mb-2">
-                                    Privacy Level
-                                </label>
-                                <select
-                                    id="privacyLevel"
-                                    name="privacyLevel"
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50 text-sm sm:text-base"
-                                    value={form.privacyLevel}
-                                    onChange={handleInputChange}
-                                >
-                                    <option value="low">Low - Basic privacy protection</option>
-                                    <option value="medium">Medium - Balanced privacy and performance</option>
-                                    <option value="high">High - Maximum privacy protection</option>
-                                </select>
+                            <div className="border-t-2 border-black pt-6">
+                                <h3 className="text-lg font-black text-black mb-4 uppercase tracking-wide flex items-center space-x-2">
+                                    <span>🔒</span>
+                                    <span>Privacy Settings</span>
+                                </h3>
+                                <div>
+                                    <label htmlFor="privacyLevel" className="block text-sm font-black text-black mb-3 uppercase tracking-wide">
+                                        Privacy Level
+                                    </label>
+                                    <select
+                                        id="privacyLevel"
+                                        name="privacyLevel"
+                                        className="w-full px-4 py-3.5 text-base border-2 border-black rounded-lg shadow-[2.5px_3px_0px_0px_rgba(0,0,0,1)] outline-none transition-all duration-200 ease-in-out focus:shadow-[5.5px_7px_0px_0px_rgba(0,0,0,1)] focus:border-black bg-white text-black font-medium"
+                                        value={form.privacyLevel}
+                                        onChange={handleInputChange}
+                                    >
+                                        <option value="low">🟡 Low - Basic privacy protection</option>
+                                        <option value="medium">🟠 Medium - Balanced privacy and performance</option>
+                                        <option value="high">🔴 High - Maximum privacy protection</option>
+                                    </select>
+                                </div>
                             </div>
 
                             {/* Submit Button */}
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-xl font-medium text-sm sm:text-base hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                                className="w-full bg-emerald-400 hover:bg-emerald-300 text-black font-black py-4 px-6 rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed hover:translate-x-[-2px] hover:translate-y-[-2px] text-lg uppercase tracking-wide"
                             >
                                 {isLoading ? (
                                     <span className="flex items-center justify-center space-x-2">
-                                        <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                        <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
-                                        <span>Creating Account...</span>
+                                        <span>CREATING VAULT...</span>
                                     </span>
                                 ) : (
-                                    'Create Account'
+                                    <span className="flex items-center justify-center space-x-2">
+                                        <span>🛡️</span>
+                                        <span>CREATE ACCOUNT</span>
+                                    </span>
                                 )}
                             </button>
                         </form>
 
                         {/* Login Link */}
-                        <div className="mt-6 text-center">
-                            <p className="text-sm text-gray-600">
+                        <div className="mt-8 text-center">
+                            <p className="text-sm text-gray-700 font-medium">
                                 Already have an account?{' '}
-                                <a href="/login" className="font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200">
-                                    Sign in
+                                <a 
+                                    href="/login" 
+                                    className="font-black text-black hover:text-emerald-600 transition-colors border-b-2 border-black hover:border-emerald-600 pb-1"
+                                >
+                                    ACCESS VAULT
                                 </a>
                             </p>
                         </div>

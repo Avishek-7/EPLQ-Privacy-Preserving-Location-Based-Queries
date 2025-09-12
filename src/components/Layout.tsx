@@ -23,88 +23,91 @@ export const Layout: React.FC<LayoutProps> = ({ children, title = 'EPLQ' }) => {
             await logout();
             navigate('/');
         } catch (error) {
-            logger.error('Logout failed:', error as Error);
+            logger.error('Layout', 'Logout failed', error as Error);
         }
     };
 
     const isActive = (path: string) => location.pathname === path;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 relative overflow-hidden">
+            {/* Background decorative elements */}
+            <div className="absolute top-10 left-10 w-60 h-60 bg-emerald-200/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-10 right-10 w-80 h-80 bg-blue-200/20 rounded-full blur-3xl"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-200/10 rounded-full blur-3xl"></div>
+            
             {/* Navigation Header */}
-            <nav className="bg-white/90 background-blur-md shadow-soft border-b border-blue-100 stricky top-0 z-50">
+            <nav className="relative z-10 bg-white/80 backdrop-blur-lg border-b-2 border-black shadow-[0_4px_0px_0px_rgba(0,0,0,1)]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16 lg:h-20">
                         {/* Logo */}
                         <Link to="/" className="flex items-center space-x-3 group">
-                            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-                                <svg className="w-6 h-6 lg:w-8 lg:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m4-4h1m-1 4h1M9 16h6" />
-                                </svg>
+                            <div className="h-10 w-10 bg-white rounded-xl flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] border-2 border-black group-hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-[-2px] group-hover:translate-y-[-2px] transition-all duration-200">
+                                <span className="text-black text-xl font-black">E</span>
                             </div>
                             <div>
-                                <h1 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                                <h1 className="text-xl lg:text-2xl font-black text-black tracking-tight">
                                     EPLQ
                                 </h1>
-                                <p className="text-xs text-gray-500 -mt-1 hidden sm:block">Empowering Personal Legal Queries</p>
+                                <p className="text-xs text-gray-700 font-medium -mt-1 hidden sm:block uppercase tracking-wider">Empowering Personal Legal Queries</p>
                             </div>
                         </Link>
 
                         {/* Desktop Navigation */}
                         <div className="hidden md:flex items-center space-x-2">
-                            <Link to="/" className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                            <Link to="/" className={`px-4 py-2 rounded-lg text-sm font-black uppercase tracking-wide transition-all duration-200 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] ${
                                 isActive('/')
-                                    ? 'bg-blue-100 text-blue-700 shadow-md'
-                                    : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
+                                    ? 'bg-emerald-400 text-black'
+                                    : 'bg-white text-black hover:bg-emerald-100'
                                 }`}
                             >
-                                Home
+                                🏠 Home
                             </Link>
                             {user && userProfile?.role === 'admin' && (
                                 <Link 
-                                    to="/AdminDashboard"
-                                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                                        isActive('/AdminDashboard')
-                                            ? 'bg-blue-100 text-blue-700 shadow-md'
-                                            : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
+                                    to="/admin"
+                                    className={`px-4 py-2 rounded-lg text-sm font-black uppercase tracking-wide transition-all duration-200 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] ${
+                                        isActive('/admin')
+                                            ? 'bg-emerald-400 text-black'
+                                            : 'bg-white text-black hover:bg-emerald-100'
                                         }`}
                                 >
-                                    Admin Dashboard
+                                    ⚙️ Admin
                                 </Link>
                             )}
                             
                             {user ? (
-                                <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-gray-200">
+                                <div className="flex items-center space-x-3 ml-4 pl-4 border-l-2 border-black">
                                     <div className="flex items-center space-x-2">
-                                        <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                                            <span className="text-white text-sm font-semibold">
+                                        <div className="w-10 h-10 bg-white rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center">
+                                            <span className="text-black text-sm font-black">
                                                 {user?.email?.charAt(0).toUpperCase()}
                                             </span>
                                         </div>
-                                        <span className="text-sm text-gray-700 hidden xl:block">
+                                        <span className="text-sm text-black font-medium hidden xl:block">
                                             {userProfile?.displayName || user?.email}
                                         </span>
                                     </div>
                                     <button
                                         onClick={handleLogout}
-                                        className="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-600 text-white text-sm font-medium rounded-xl hover:from-red-600 hover:to-pink-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                                        className="px-4 py-2 bg-red-400 text-black text-sm font-black rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:bg-red-300 transition-all duration-200 uppercase tracking-wide"
                                     >
-                                        Logout
+                                        🚪 Logout
                                     </button>
                                 </div>
                             ) : (
-                                <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-gray-200">
+                                <div className="flex items-center space-x-3 ml-4 pl-4 border-l-2 border-black">
                                     <Link
                                         to="/login"
-                                        className="px-4 py-2 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-100 hover:text-blue-600 transition-all duration-200"
+                                        className="px-4 py-2 bg-white text-black text-sm font-black rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:bg-gray-100 transition-all duration-200 uppercase tracking-wide"
                                     >
-                                        Login
+                                        🔑 Login
                                     </Link>
                                     <Link
                                         to="/register"
-                                        className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-medium rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                                        className="px-4 py-2 bg-emerald-400 text-black text-sm font-black rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:bg-emerald-300 transition-all duration-200 uppercase tracking-wide"
                                     >
-                                        Register
+                                        🛡️ Register
                                     </Link>
                                 </div>
                             )}
@@ -114,13 +117,13 @@ export const Layout: React.FC<LayoutProps> = ({ children, title = 'EPLQ' }) => {
                         <div className="md:hidden">
                             <button
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                className="p-2 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-gray-100 transition-colors duration-200"
+                                className="p-2 rounded-lg bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-black hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all duration-200"
                             >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-6 h-6 font-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
                                     {isMobileMenuOpen ? (
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                                     ) : (
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                                     )}
                                 </svg>
                             </button>
@@ -129,43 +132,43 @@ export const Layout: React.FC<LayoutProps> = ({ children, title = 'EPLQ' }) => {
 
                     {/* Mobile Menu */}
                     {isMobileMenuOpen && (
-                        <div className="md:hidden border-t border-gray-200 bg-white/95 backdrop-blur-md">
-                            <div className="px-4 py-3 space-y-2">
+                        <div className="md:hidden border-t-2 border-black bg-white/90 backdrop-blur-lg shadow-[0_4px_0px_0px_rgba(0,0,0,1)]">
+                            <div className="px-4 py-3 space-y-3">
                                 <Link
                                     to="/"
-                                    className={`block px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                                    className={`block px-4 py-2 rounded-lg text-sm font-black uppercase tracking-wide transition-all duration-200 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
                                         isActive('/')
-                                            ? 'bg-blue-100 text-blue-700'
-                                            : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
+                                            ? 'bg-emerald-400 text-black'
+                                            : 'bg-white text-black hover:bg-emerald-100'
                                     }`}
                                     onClick={() => setIsMobileMenuOpen(false)}
                                 >
-                                    Home
+                                    🏠 Home
                                 </Link>
                                 
                                 {user && userProfile?.role === 'admin' && (
                                     <Link
-                                        to="/AdminDashboard"
-                                        className={`block px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                                            isActive('/AdminDashboard')
-                                                ? 'bg-blue-100 text-blue-700'
-                                                : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
+                                        to="/admin"
+                                        className={`block px-4 py-2 rounded-lg text-sm font-black uppercase tracking-wide transition-all duration-200 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
+                                            isActive('/admin')
+                                                ? 'bg-emerald-400 text-black'
+                                                : 'bg-white text-black hover:bg-emerald-100'
                                         }`}
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
-                                        Admin Dashboard
+                                        ⚙️ Admin Dashboard
                                     </Link>
                                 )}
 
                                 {user ? (
-                                    <div className="pt-2 border-t border-gray-200">
-                                        <div className="flex items-center space-x-3 px-4 py-2">
-                                            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                                                <span className="text-white text-sm font-semibold">
+                                    <div className="pt-2 border-t-2 border-black space-y-3">
+                                        <div className="flex items-center space-x-3 px-4 py-2 bg-white border-2 border-black rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                                            <div className="w-8 h-8 bg-emerald-400 border-2 border-black rounded-lg flex items-center justify-center">
+                                                <span className="text-black text-sm font-black">
                                                     {user?.email?.charAt(0).toUpperCase()}
                                                 </span>
                                             </div>
-                                            <span className="text-sm text-gray-700">
+                                            <span className="text-sm text-black font-medium">
                                                 {userProfile?.displayName || user?.email}
                                             </span>
                                         </div>
@@ -174,26 +177,26 @@ export const Layout: React.FC<LayoutProps> = ({ children, title = 'EPLQ' }) => {
                                                 handleLogout();
                                                 setIsMobileMenuOpen(false);
                                             }}
-                                            className="w-full text-left px-4 py-2 text-red-600 text-sm font-medium rounded-xl hover:bg-red-50 transition-all duration-200"
+                                            className="w-full px-4 py-2 bg-red-400 text-black text-sm font-black rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-red-300 transition-all duration-200 uppercase tracking-wide"
                                         >
-                                            Logout
+                                            🚪 Logout
                                         </button>
                                     </div>
                                 ) : (
-                                    <div className="pt-2 border-t border-gray-200 space-y-2">
+                                    <div className="pt-2 border-t-2 border-black space-y-3">
                                         <Link
                                             to="/login"
-                                            className="block px-4 py-2 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-100 hover:text-blue-600 transition-all duration-200"
+                                            className="block px-4 py-2 bg-white text-black text-sm font-black rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-gray-100 transition-all duration-200 uppercase tracking-wide text-center"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
-                                            Login
+                                            🔑 Login
                                         </Link>
                                         <Link
                                             to="/register"
-                                            className="block px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-medium rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-200 text-center"
+                                            className="block px-4 py-2 bg-emerald-400 text-black text-sm font-black rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-emerald-300 transition-all duration-200 uppercase tracking-wide text-center"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
-                                            Register
+                                            🛡️ Register
                                         </Link>
                                     </div>
                                 )}
@@ -204,7 +207,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, title = 'EPLQ' }) => {
             </nav>
 
             {/* Main Content */}
-            <main className="flex-1">
+            <main className="flex-1 relative z-10">
                 {children}
             </main>
         </div>

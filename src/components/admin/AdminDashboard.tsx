@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import DataUpload from './DataUpload';
@@ -7,6 +7,7 @@ import UserManagement from './UserManagement';
 import SystemStats from './SystemStats';
 import EncryptedDataViewer from './EncryptedDataViewer';
 import AdminSettings from './AdminSettings';
+import AdminRoleManagement from './AdminRoleManagement';
 
 interface AdminStats {
     totalUsers: number;
@@ -17,7 +18,7 @@ interface AdminStats {
 
 const AdminDashboard: React.FC = () => {
     const { userProfile, logout } = useAuth();
-    const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'data' | 'upload' | 'settings'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'roles' | 'data' | 'upload' | 'settings'>('overview');
     const [stats, setStats] = useState<AdminStats>({
         totalUsers: 0,
         totalQueries: 0,
@@ -143,13 +144,14 @@ const AdminDashboard: React.FC = () => {
                         {[
                             { id: 'overview', label: 'Overview', icon: '📊', description: 'System statistics' },
                             { id: 'users', label: 'User Management', icon: '👥', description: 'Manage users' },
+                            { id: 'roles', label: 'Role Management', icon: '🔑', description: 'Admin privileges' },
                             { id: 'data', label: 'Data Viewer', icon: '🔒', description: 'View encrypted data' },
                             { id: 'upload', label: 'Upload POIs', icon: '📤', description: 'Upload POI data' },
                             { id: 'settings', label: 'Settings', icon: '⚙️', description: 'System configuration' }
                         ].map((tab) => (
                             <button
                                 key={tab.id}
-                                onClick={() => setActiveTab(tab.id as any)}
+                                onClick={() => setActiveTab(tab.id as 'overview' | 'users' | 'data' | 'upload' | 'settings')}
                                 className={`group py-4 px-2 border-b-2 font-medium text-sm transition-colors relative ${
                                     activeTab === tab.id
                                         ? 'border-blue-500 text-blue-600'
@@ -185,6 +187,7 @@ const AdminDashboard: React.FC = () => {
                             <SystemStats stats={stats} onRefresh={loadAdminStats} />
                         )}
                         {activeTab === 'users' && <UserManagement />}
+                        {activeTab === 'roles' && <AdminRoleManagement />}
                         {activeTab === 'data' && <EncryptedDataViewer />}
                         {activeTab === 'upload' && <DataUpload onUploadSuccess={loadAdminStats} />}
                         {activeTab === 'settings' && <AdminSettings />}

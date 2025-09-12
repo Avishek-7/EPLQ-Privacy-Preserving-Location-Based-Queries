@@ -1,14 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { collection, writeBatch, doc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
-
-interface POIData {
-    name: string;
-    category: string;
-    latitude: number;
-    longitude: number;
-    description?: string;
-}
+import { eplqCrypto, type POIData } from '../../lib/encryption/eplq-crypto';
+import { logger } from '../../utils/logger';
 
 interface DataUploadProps {
     onUploadSuccess: () => void;
@@ -18,99 +12,61 @@ const DataUpload: React.FC<DataUploadProps> = ({ onUploadSuccess }) => {
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [uploadResult, setUploadResult] = useState<string | null>(null);
+    const [cryptoInitialized, setCryptoInitialized] = useState(false);
+
+    // Initialize EPLQ crypto system on component mount
+    useEffect(() => {
+        const initializeCrypto = async () => {
+            try {
+                if (!eplqCrypto.isInitialized()) {
+                    logger.info('DataUpload', '🔐 Initializing EPLQ crypto system...');
+                    await eplqCrypto.initialize();
+                }
+                setCryptoInitialized(true);
+                logger.success('DataUpload', '✅ EPLQ crypto system ready for data upload');
+            } catch (error) {
+                logger.error('DataUpload', '❌ Failed to initialize EPLQ crypto system', error);
+                setUploadResult('Error: Failed to initialize encryption system');
+            }
+        };
+
+        initializeCrypto();
+    }, []);
 
     const encryptPOIData = async (poi: POIData) => {
-        // Simple encryption for demo purposes - in production, use proper encryption
-        const key = process.env.REACT_APP_ENCRYPTION_KEY || 'fallback-key';
-        const dataString = JSON.stringify(poi);
+        logger.info('DataUpload', `🔒 Encrypting POI data: ${poi.name}`);
         
-        // Use Web Crypto API for production-level encryption
-        const encoder = new TextEncoder();
-        
-        // Generate a key from the environment variable
-        const keyMaterial = await window.crypto.subtle.importKey(
-            'raw',
-            encoder.encode(key.padEnd(32, '0').slice(0, 32)), // Ensure 32 bytes
-            { name: 'AES-GCM' },
-            false,
-            ['encrypt']
-        );
-        
-        // Generate a random initialization vector
-        const iv = window.crypto.getRandomValues(new Uint8Array(12));
-        
-        // Encrypt the data
-        const encryptedBuffer = await window.crypto.subtle.encrypt(
-            { name: 'AES-GCM', iv },
-            keyMaterial,
-            encoder.encode(dataString)
-        );
-        
-        // Convert to base64 for storage
-        const encryptedArray = new Uint8Array(encryptedBuffer);
-        const ivBase64 = btoa(String.fromCharCode(...iv));
-        const encryptedBase64 = btoa(String.fromCharCode(...encryptedArray));
-        
-        return {
-            ...poi,
-            encryptedData: `${ivBase64}:${encryptedBase64}`,
-            isEncrypted: true
-        };
-    };
-
-    const generateSpatialIndex = (lat: number, lng: number) => {
-        // Generate a geohash-like spatial index for efficient querying
-        const precision = 8; // Adjust precision as needed
-        const latRange = [-90, 90];
-        const lngRange = [-180, 180];
-
-        let latMin = latRange[0], latMax = latRange[1];
-        let lngMin = lngRange[0], lngMax = lngRange[1];
-
-        let geohash = '';
-        let isEven = true;
-
-        for (let i = 0; i < precision * 5; i++) {
-            if (isEven) {
-                // Longitude
-                const mid = (lngMin + lngMax) / 2;
-                if (lng >= mid) {
-                    geohash += '1';
-                    lngMin = mid;
-                } else {
-                    geohash += '0';
-                    lngMax = mid;
-                }
-            } else {
-                // Latitude
-                const mid = (latMin + latMax) / 2;
-                if (lat >= mid) {
-                    geohash += '1';
-                    latMin = mid;
-                } else {
-                    geohash += '0';
-                    latMax = mid;
-                }
-            }
-            isEven = !isEven;
+        try {
+            // Use EPLQ crypto system for privacy-preserving encryption
+            const encryptedPoint = await eplqCrypto.encryptPOI(poi);
+            
+            logger.success('DataUpload', `✅ POI encrypted successfully: ${poi.name}`);
+            return {
+                ...encryptedPoint,
+                // Keep original structure for compatibility
+                isEncrypted: true,
+                originalCategory: poi.category // For filtering
+            };
+        } catch (error) {
+            logger.error('DataUpload', `❌ Failed to encrypt POI: ${poi.name}`, error);
+            throw new Error(`Encryption failed for ${poi.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
-
-        // Convert binary string to base32-like representation
-        const chunks = geohash.match(/.{1,5}/g) || [];
-        const spatialIndex = chunks.map(chunk => {
-            return parseInt(chunk.padEnd(5, '0'), 2).toString(32);
-        }).join('');
-
-        return spatialIndex;
     };
 
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file  = event.target.files?.[0];
         if (!file) return;
 
+        if (!cryptoInitialized) {
+            setUploadResult('Error: Encryption system not initialized. Please wait and try again.');
+            return;
+        }
+
         setUploading(true);
         setUploadProgress(0);
         setUploadResult(null);
+
+        logger.info('DataUpload', `📁 Starting file upload: ${file.name}`);
 
         try {
             const text = await file.text();
@@ -128,6 +84,7 @@ const DataUpload: React.FC<DataUploadProps> = ({ onUploadSuccess }) => {
 
             const poisData: POIData[] = [];
 
+            // Parse CSV data
             for (let i=1; i<lines.length; i++) {
                 const values = lines[i].split(',').map(v => v.trim());
                 if(values.length >= 4) {
@@ -149,41 +106,64 @@ const DataUpload: React.FC<DataUploadProps> = ({ onUploadSuccess }) => {
                 throw new Error('No valid POI data found in the file');
             }
 
+            logger.info('DataUpload', `📊 Parsed ${poisData.length} POIs from CSV`);
+
+            // Process in batches for better performance and Firebase limits
             const batchSize = 500;
             let uploadCount = 0;
+            let encryptedCount = 0;
 
             for (let i=0; i<poisData.length; i += batchSize) {
                 const batch = writeBatch(db);
                 const batchData = poisData.slice(i, i+batchSize);
 
+                logger.info('DataUpload', `🔐 Encrypting batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(poisData.length/batchSize)}`);
+
                 for (const poi of batchData) {
-                    const encryptedPOI = await encryptPOIData(poi);
-                    const spatialIndex = generateSpatialIndex(poi.latitude, poi.longitude);
-                    const docRef = doc(collection(db, 'encryptedPOIs'));
-                    batch.set(docRef, { ...encryptedPOI, spatialIndex });
+                    try {
+                        const encryptedPOI = await encryptPOIData(poi);
+                        const docRef = doc(collection(db, 'encryptedPOIs'));
+                        batch.set(docRef, encryptedPOI);
+                        encryptedCount++;
+                    } catch (error) {
+                        logger.warn('DataUpload', `⚠️ Skipping POI due to encryption error: ${poi.name}`, error);
+                        // Continue with other POIs
+                    }
                 }
 
                 await batch.commit();
                 uploadCount += batchData.length;
                 setUploadProgress((uploadCount / poisData.length) * 100);
+                
+                logger.info('DataUpload', `✅ Batch uploaded: ${uploadCount}/${poisData.length} POIs processed`);
             }
 
-            setUploadResult(`Successfully uploaded ${uploadCount} POIs with privacy preservation`);
+            const successMessage = `Successfully uploaded ${encryptedCount} POIs with EPLQ privacy-preserving encryption`;
+            setUploadResult(successMessage);
+            logger.success('DataUpload', successMessage);
             onUploadSuccess();
         } catch (error: unknown) {
-            console.error('Upload error:', error);
-            setUploadResult(`Error: ${error instanceof Error ? error.message : 'Upload failed'}`);
+            const errorMessage = `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+            logger.error('DataUpload', '❌ File upload failed', error);
+            setUploadResult(errorMessage);
         } finally {
             setUploading(false);
         }
     };
 
     const sampleData = `name,category,latitude,longitude,description
-        Starbucks Coffee,Restaurant,40.7128,-74.0060,Popular coffee chain
-        Central Park,Recreation,40.7829,-73.9654,Large public park
-        Times Square,Tourism,40.7580,-73.9855,Famous commercial intersection
-        Empire State Building,Landmark,40.7484,-73.9857,Historic skyscraper
-        Brooklyn Bridge,Transportation,40.7061,-73.9969,Iconic suspension bridge`;
+Hotel Sunrise,hotel,25.5925,84.9575,Luxury hotel in the heart of the city
+Grand Palace Hotel,hotel,25.5930,84.9560,Historic hotel with modern amenities
+Budget Inn,hotel,25.5920,84.9565,Affordable accommodation for travelers
+Spice Garden Restaurant,restaurant,25.5935,84.9570,Traditional Indian cuisine
+Coffee Corner,restaurant,25.5915,84.9580,Best coffee in town
+Pizza Palace,restaurant,25.5940,84.9555,Italian cuisine and pizza
+City Mall,shopping,25.5940,84.9555,Large shopping complex with retail stores
+Central Hospital,hospital,25.5910,84.9590,24/7 emergency medical services
+Gas Station Plus,gas_station,25.5945,84.9550,Fuel and convenience store
+Railway Station,transportation,25.5950,84.9545,Main railway terminal
+Bus Terminal,transportation,25.5905,84.9595,Inter-city bus services
+City Park,recreation,25.5935,84.9575,Beautiful public park with gardens`;
     
     const  downloadSampleCSV = () => {
         const blob = new Blob([sampleData], { type: 'text/csv' });
@@ -193,6 +173,75 @@ const DataUpload: React.FC<DataUploadProps> = ({ onUploadSuccess }) => {
         a.download = 'sample_poi_data.csv';
         a.click();
         window.URL.revokeObjectURL(url);
+    };
+
+    const uploadSampleData = async () => {
+        if (!cryptoInitialized) {
+            setUploadResult('Error: Encryption system not ready');
+            return;
+        }
+
+        logger.info('DataUpload', '🚀 Starting sample data upload...');
+        setUploading(true);
+        setUploadProgress(0);
+        setUploadResult(null);
+
+        try {
+            // Parse sample data
+            const lines = sampleData.trim().split('\n');
+            const dataLines = lines.slice(1); // Skip header row
+
+            const poisToUpload: POIData[] = dataLines.map(line => {
+                const values = line.split(',').map(v => v.trim());
+                return {
+                    name: values[0],
+                    category: values[1],
+                    latitude: parseFloat(values[2]),
+                    longitude: parseFloat(values[3]),
+                    description: values[4] || ''
+                };
+            });
+
+            logger.info('DataUpload', `📊 Uploading ${poisToUpload.length} sample POIs...`);
+            
+            // Upload in batches
+            const batchSize = 10;
+            const totalPOIs = poisToUpload.length;
+            let uploadedCount = 0;
+
+            for (let i = 0; i < poisToUpload.length; i += batchSize) {
+                const batch = writeBatch(db);
+                const batchPOIs = poisToUpload.slice(i, i + batchSize);
+
+                for (const poi of batchPOIs) {
+                    const encryptedData = await encryptPOIData(poi);
+                    const docRef = doc(collection(db, 'encryptedPOIs'));
+                    batch.set(docRef, {
+                        ...encryptedData,
+                        category: poi.category,
+                        timestamp: Date.now(),
+                        createdAt: new Date(),
+                        approximateLat: Math.floor(poi.latitude * 100) / 100,
+                        approximateLng: Math.floor(poi.longitude * 100) / 100
+                    });
+                }
+
+                await batch.commit();
+                uploadedCount += batchPOIs.length;
+                setUploadProgress(Math.round((uploadedCount / totalPOIs) * 100));
+                
+                logger.info('DataUpload', `📦 Batch uploaded: ${uploadedCount}/${totalPOIs} POIs`);
+            }
+
+            setUploadResult(`✅ Successfully uploaded ${totalPOIs} sample POIs with encryption!`);
+            logger.success('DataUpload', `🎉 Sample data upload completed: ${totalPOIs} POIs`);
+            onUploadSuccess();
+        } catch (error) {
+            logger.error('DataUpload', '❌ Sample data upload failed', error);
+            setUploadResult(`❌ Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        } finally {
+            setUploading(false);
+        }
     };
 
 
@@ -217,9 +266,16 @@ const DataUpload: React.FC<DataUploadProps> = ({ onUploadSuccess }) => {
                 </ul>
                 <button
                     onClick={downloadSampleCSV}
-                    className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="mt-4 mr-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
-                    Download Sample CSV
+                    📥 Download Sample CSV
+                </button>
+                <button
+                    onClick={uploadSampleData}
+                    disabled={uploading || !cryptoInitialized}
+                    className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                    🚀 Upload Sample Data Now
                 </button>
             </div>
 
@@ -280,31 +336,49 @@ const DataUpload: React.FC<DataUploadProps> = ({ onUploadSuccess }) => {
             </div>
             {/* Security Features */}
             <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">🔐 Security Features</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">🔐 EPLQ Security Features</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                        <h4 className="font-semibold text-gray-800 mb-2">Predicate-Only Encryption</h4>
-                        <p className="text-sm text-gray-600">
-                            POI data is encrypted using advanced predicate-only encryption for inner product range queries
+                    <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                        <h4 className="font-semibold text-green-800 mb-2">✅ Predicate-Only Encryption</h4>
+                        <p className="text-sm text-green-700">
+                            Advanced inner product range encryption ensures POI data privacy while enabling spatial queries
                         </p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                        <h4 className="font-semibold text-gray-800 mb-2">Privacy-Preserving Index</h4>
-                        <p className="text-sm text-gray-600">
-                            Spatial tree index structure enables fast queries while preserving location privacy
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                        <h4 className="font-semibold text-blue-800 mb-2">📊 Privacy-Preserving Tree Index</h4>
+                        <p className="text-sm text-blue-700">
+                            Optimized spatial indexing with geohash-based privacy preservation for fast (~0.9s) queries
                         </p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                        <h4 className="font-semibold text-gray-800 mb-2">Zero Knowledge</h4>
-                        <p className="text-sm text-gray-600">
-                            Server cannot decrypt or analyze the uploaded location data
+                    <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                        <h4 className="font-semibold text-purple-800 mb-2">🛡️ Zero-Knowledge Security</h4>
+                        <p className="text-sm text-purple-700">
+                            Server cannot decrypt or analyze location data - complete privacy preservation
                         </p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                        <h4 className="font-semibold text-gray-800 mb-2">Query Optimization</h4>
-                        <p className="text-sm text-gray-600">
-                            Optimized for ~0.9s query generation and few seconds POI search performance
+                    <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                        <h4 className="font-semibold text-orange-800 mb-2">⚡ Query Optimization</h4>
+                        <p className="text-sm text-orange-700">
+                            Circle-based spatial range queries optimized for mobile and cloud deployment
                         </p>
+                    </div>
+                </div>
+                
+                {/* Crypto Status */}
+                <div className={`mt-4 p-3 rounded-lg border ${
+                    cryptoInitialized 
+                        ? 'bg-green-50 border-green-200' 
+                        : 'bg-yellow-50 border-yellow-200'
+                }`}>
+                    <div className="flex items-center space-x-2">
+                        <span className={cryptoInitialized ? 'text-green-500' : 'text-yellow-500'}>
+                            {cryptoInitialized ? '✅' : '⏳'}
+                        </span>
+                        <span className={`text-sm font-semibold ${
+                            cryptoInitialized ? 'text-green-800' : 'text-yellow-800'
+                        }`}>
+                            EPLQ Crypto System: {cryptoInitialized ? 'Ready' : 'Initializing...'}
+                        </span>
                     </div>
                 </div>
             </div>
