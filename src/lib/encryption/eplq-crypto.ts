@@ -47,14 +47,27 @@ export class EPLQCrypto {
     private keyPair: EPLQKeyPair | null = null;
     private spatialPrecision = 8; // Geohash precision
     private initialized = false;
+    private readonly STORAGE_KEY = 'eplq_crypto_keys';
 
     /**
-     * Initialize the EPLQ cryptographic system
+     * Initialize the EPLQ cryptographic system with persistent keys
      */
     async initialize(): Promise<void> {
         logger.info('EPLQCrypto', '🔐 Initializing EPLQ cryptographic system...');
         
         try {
+            // Try to load existing keys first
+            const existingKeys = await this.loadPersistedKeys();
+            if (existingKeys) {
+                this.keyPair = existingKeys;
+                this.initialized = true;
+                logger.success('EPLQCrypto', '✅ EPLQ crypto system initialized with existing keys');
+                return;
+            }
+
+            // Generate new keys if none exist
+            logger.info('EPLQCrypto', '🆕 Generating new encryption keys...');
+            
             // Generate RSA key pair for predicate encryption
             const rsaKeyPair = await window.crypto.subtle.generateKey(
                 {
@@ -83,12 +96,130 @@ export class EPLQCrypto {
                 symmetricKey: aesKey
             };
 
+            // Persist the new keys
+            await this.persistKeys(this.keyPair);
+
             this.initialized = true;
-            logger.success('EPLQCrypto', '✅ EPLQ cryptographic system initialized successfully');
+            logger.success('EPLQCrypto', '✅ EPLQ crypto system initialized with new persistent keys');
         } catch (error) {
             logger.error('EPLQCrypto', '❌ Failed to initialize EPLQ crypto system', error);
             throw new Error('EPLQ initialization failed');
         }
+    }
+
+    /**
+     * Persist encryption keys to localStorage
+     */
+    private async persistKeys(keyPair: EPLQKeyPair): Promise<void> {
+        try {
+            logger.info('EPLQCrypto', '💾 Persisting encryption keys...');
+
+            // Export keys to raw format for storage
+            const [publicKeyRaw, privateKeyRaw, symmetricKeyRaw] = await Promise.all([
+                window.crypto.subtle.exportKey('spki', keyPair.publicKey),
+                window.crypto.subtle.exportKey('pkcs8', keyPair.privateKey),
+                window.crypto.subtle.exportKey('raw', keyPair.symmetricKey)
+            ]);
+
+            // Convert to base64 for storage
+            const keyData = {
+                publicKey: this.arrayBufferToBase64(publicKeyRaw),
+                privateKey: this.arrayBufferToBase64(privateKeyRaw),
+                symmetricKey: this.arrayBufferToBase64(symmetricKeyRaw),
+                timestamp: Date.now()
+            };
+
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(keyData));
+            logger.success('EPLQCrypto', '✅ Keys persisted successfully');
+        } catch (error) {
+            logger.error('EPLQCrypto', '❌ Failed to persist keys', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Load persisted encryption keys from localStorage
+     */
+    private async loadPersistedKeys(): Promise<EPLQKeyPair | null> {
+        try {
+            const keyDataStr = localStorage.getItem(this.STORAGE_KEY);
+            if (!keyDataStr) {
+                logger.info('EPLQCrypto', '📭 No persisted keys found');
+                return null;
+            }
+
+            logger.info('EPLQCrypto', '🔑 Loading persisted encryption keys...');
+            const keyData = JSON.parse(keyDataStr);
+
+            // Convert from base64 back to ArrayBuffer
+            const [publicKeyRaw, privateKeyRaw, symmetricKeyRaw] = [
+                this.base64ToArrayBuffer(keyData.publicKey),
+                this.base64ToArrayBuffer(keyData.privateKey),
+                this.base64ToArrayBuffer(keyData.symmetricKey)
+            ];
+
+            // Import keys back to CryptoKey objects
+            const [publicKey, privateKey, symmetricKey] = await Promise.all([
+                window.crypto.subtle.importKey(
+                    'spki',
+                    publicKeyRaw,
+                    { name: 'RSA-OAEP', hash: 'SHA-256' },
+                    true,
+                    ['encrypt']
+                ),
+                window.crypto.subtle.importKey(
+                    'pkcs8',
+                    privateKeyRaw,
+                    { name: 'RSA-OAEP', hash: 'SHA-256' },
+                    true,
+                    ['decrypt']
+                ),
+                window.crypto.subtle.importKey(
+                    'raw',
+                    symmetricKeyRaw,
+                    { name: 'AES-GCM' },
+                    true,
+                    ['encrypt', 'decrypt']
+                )
+            ]);
+
+            logger.success('EPLQCrypto', '✅ Persisted keys loaded successfully');
+            return { publicKey, privateKey, symmetricKey };
+        } catch (error) {
+            logger.error('EPLQCrypto', '❌ Failed to load persisted keys', error);
+            // Clear corrupted keys
+            localStorage.removeItem(this.STORAGE_KEY);
+            return null;
+        }
+    }
+
+    /**
+     * Clear all persisted keys (for testing/reset purposes)
+     */
+    async clearPersistedKeys(): Promise<void> {
+        localStorage.removeItem(this.STORAGE_KEY);
+        logger.info('EPLQCrypto', '🗑️ Persisted keys cleared');
+    }
+
+    /**
+     * Utility: Convert ArrayBuffer to base64
+     */
+    private arrayBufferToBase64(buffer: ArrayBuffer): string {
+        const bytes = new Uint8Array(buffer);
+        const binary = String.fromCharCode(...bytes);
+        return btoa(binary);
+    }
+
+    /**
+     * Utility: Convert base64 to ArrayBuffer
+     */
+    private base64ToArrayBuffer(base64: string): ArrayBuffer {
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+        return bytes.buffer;
     }
 
     /**

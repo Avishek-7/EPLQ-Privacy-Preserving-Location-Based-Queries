@@ -100,7 +100,10 @@ export class EPLQQueryService {
             // Step 5: Log query for analytics
             await this.logQuery({
                 queryId,
-                predicate,
+                predicate: {
+                    ...predicate,
+                    category: predicate.category || 'all' // Ensure category is never undefined
+                },
                 resultCount: limitedResults.length,
                 executionTime,
                 timestamp: Date.now(),

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, writeBatch, doc } from 'firebase/firestore';
+import { collection, writeBatch, doc, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { eplqCrypto, type POIData } from '../../lib/encryption/eplq-crypto';
 import { logger } from '../../utils/logger';
@@ -244,6 +244,84 @@ City Park,recreation,25.5935,84.9575,Beautiful public park with gardens`;
         }
     };
 
+    const clearAllPOIData = async () => {
+        if (!cryptoInitialized) {
+            setUploadResult('Error: Encryption system not ready');
+            return;
+        }
+
+        logger.info('DataUpload', '🧹 Starting to clear all POI data...');
+        setUploading(true);
+        setUploadProgress(0);
+        setUploadResult(null);
+
+        try {
+            const poisRef = collection(db, 'encryptedPOIs');
+            const snapshot = await getDocs(poisRef);
+            
+            if (snapshot.empty) {
+                setUploadResult('✅ No POI data found - database is already clean!');
+                return;
+            }
+
+            logger.info('DataUpload', `📊 Found ${snapshot.size} POI documents to delete`);
+            
+            let deletedCount = 0;
+            const batchSize = 10;
+            const docs = snapshot.docs;
+
+            // Delete in batches to avoid hitting Firestore limits
+            for (let i = 0; i < docs.length; i += batchSize) {
+                const batch = writeBatch(db);
+                const batchDocs = docs.slice(i, i + batchSize);
+
+                for (const docSnap of batchDocs) {
+                    batch.delete(docSnap.ref);
+                }
+
+                await batch.commit();
+                deletedCount += batchDocs.length;
+                setUploadProgress(Math.round((deletedCount / docs.length) * 100));
+                
+                logger.info('DataUpload', `🗑️ Deleted batch: ${deletedCount}/${docs.length} POIs`);
+            }
+
+            setUploadResult(`✅ Successfully cleared ${deletedCount} POI documents! Database is now clean.`);
+            logger.success('DataUpload', `🎉 POI data cleanup completed: ${deletedCount} documents deleted`);
+            onUploadSuccess();
+        } catch (error) {
+            logger.error('DataUpload', '❌ POI data cleanup failed', error);
+            setUploadResult(`❌ Cleanup failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const resetEncryptionKeys = async () => {
+        try {
+            setUploading(true);
+            setUploadProgress(0);
+            setUploadResult(null);
+            
+            logger.info('DataUpload', '🔄 Resetting encryption keys...');
+            
+            // Clear persisted keys
+            await eplqCrypto.clearPersistedKeys();
+            
+            // Re-initialize with new keys
+            await eplqCrypto.initialize();
+            
+            setCryptoInitialized(true);
+            setUploadResult('✅ Encryption keys reset successfully! New keys generated.');
+            logger.success('DataUpload', '🎉 Encryption keys reset completed');
+        } catch (error) {
+            logger.error('DataUpload', '❌ Key reset failed', error);
+            setUploadResult(`❌ Key reset failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        } finally {
+            setUploading(false);
+        }
+    };
+
 
     return (
         <div className="space-y-6">
@@ -273,9 +351,23 @@ City Park,recreation,25.5935,84.9575,Beautiful public park with gardens`;
                 <button
                     onClick={uploadSampleData}
                     disabled={uploading || !cryptoInitialized}
-                    className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="mt-4 mr-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                     🚀 Upload Sample Data Now
+                </button>
+                <button
+                    onClick={clearAllPOIData}
+                    disabled={uploading || !cryptoInitialized}
+                    className="mt-4 mr-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                    🗑️ Clear All POI Data
+                </button>
+                <button
+                    onClick={resetEncryptionKeys}
+                    disabled={uploading}
+                    className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                    🔄 Reset Encryption Keys
                 </button>
             </div>
 
