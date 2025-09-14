@@ -1,8 +1,3 @@
-/**
- * EPLQ Query Service
- * Handles privacy-preserving spatial queries using the EPLQ cryptographic system
- */
-
 import { collection, query, getDocs, where, orderBy, limit, doc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { eplqCrypto, type QueryPredicate, type POIData, type EncryptedPoint } from '../lib/encryption/eplq-crypto';
