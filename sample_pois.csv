@@ -1,0 +1,13 @@
+name,category,latitude,longitude,description
+Hotel Sunrise,hotel,25.6200,85.1600,Luxury hotel in the heart of the city
+Grand Palace Hotel,hotel,25.6250,85.1650,Historic hotel with modern amenities
+Budget Inn,hotel,25.6150,85.1550,Affordable accommodation for travelers
+Spice Garden Restaurant,restaurant,25.6300,85.1700,Traditional Indian cuisine
+Coffee Corner,restaurant,25.6220,85.1620,Best coffee in town
+Pizza Palace,restaurant,25.6180,85.1580,Italian cuisine and pizza
+City Mall,shopping,25.6240,85.1640,Large shopping complex with retail stores
+Central Hospital,hospital,25.6160,85.1560,24/7 emergency medical services
+Gas Station Plus,gas_station,25.6280,85.1680,Fuel and convenience store
+Railway Station,transportation,25.6260,85.1660,Main railway terminal
+Bus Terminal,transportation,25.6140,85.1540,Inter-city bus services
+City Park,recreation,25.6230,85.1630,Beautiful public park with gardens

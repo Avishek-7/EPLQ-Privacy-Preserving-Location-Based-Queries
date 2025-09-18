@@ -22,8 +22,51 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment files
 .env
-.env
+.env.local
+.env.development
+.env.test
+.env.production
 src/.env
 server/.env
-.env
+
+# Python virtual environment
+osm_env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Generated CSV files from Geofabrik conversion
+*.csv
+!sample_pois.csv
+
+# Temporary files
+temp_poi_data.json
+temp_extract/
+
+# Downloaded OSM files
+*.osm
+*.osm.bz2
+*.osm.gz
+*.osm.pbf
+
+# Shell scripts (keeping for reference but not tracking changes)
+download_pois.sh
+poi_downloader.sh
+safe_poi_downloader.sh
+simple_poi_downloader.sh
+
+# Safe data directory (may contain sensitive test data)
+safe_data/
+
+# Documentation files (keeping main docs)
+poi_data_sources.md

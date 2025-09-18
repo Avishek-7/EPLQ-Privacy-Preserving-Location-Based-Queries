@@ -152,18 +152,18 @@ const DataUpload: React.FC<DataUploadProps> = ({ onUploadSuccess }) => {
     };
 
     const sampleData = `name,category,latitude,longitude,description
-Hotel Sunrise,hotel,25.5925,84.9575,Luxury hotel in the heart of the city
-Grand Palace Hotel,hotel,25.5930,84.9560,Historic hotel with modern amenities
-Budget Inn,hotel,25.5920,84.9565,Affordable accommodation for travelers
-Spice Garden Restaurant,restaurant,25.5935,84.9570,Traditional Indian cuisine
-Coffee Corner,restaurant,25.5915,84.9580,Best coffee in town
-Pizza Palace,restaurant,25.5940,84.9555,Italian cuisine and pizza
-City Mall,shopping,25.5940,84.9555,Large shopping complex with retail stores
-Central Hospital,hospital,25.5910,84.9590,24/7 emergency medical services
-Gas Station Plus,gas_station,25.5945,84.9550,Fuel and convenience store
-Railway Station,transportation,25.5950,84.9545,Main railway terminal
-Bus Terminal,transportation,25.5905,84.9595,Inter-city bus services
-City Park,recreation,25.5935,84.9575,Beautiful public park with gardens`;
+Hotel Sunrise,hotel,25.6200,85.1600,Luxury hotel in the heart of the city
+Grand Palace Hotel,hotel,25.6250,85.1650,Historic hotel with modern amenities
+Budget Inn,hotel,25.6150,85.1550,Affordable accommodation for travelers
+Spice Garden Restaurant,restaurant,25.6300,85.1700,Traditional Indian cuisine
+Coffee Corner,restaurant,25.6220,85.1620,Best coffee in town
+Pizza Palace,restaurant,25.6180,85.1580,Italian cuisine and pizza
+City Mall,shopping,25.6240,85.1640,Large shopping complex with retail stores
+Central Hospital,hospital,25.6160,85.1560,24/7 emergency medical services
+Gas Station Plus,gas_station,25.6280,85.1680,Fuel and convenience store
+Railway Station,transportation,25.6260,85.1660,Main railway terminal
+Bus Terminal,transportation,25.6140,85.1540,Inter-city bus services
+City Park,recreation,25.6230,85.1630,Beautiful public park with gardens`;
     
     const  downloadSampleCSV = () => {
         const blob = new Blob([sampleData], { type: 'text/csv' });
