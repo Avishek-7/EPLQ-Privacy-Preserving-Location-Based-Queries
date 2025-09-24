@@ -32,7 +32,8 @@ python geofabrik_to_csv.py input_file.zip output_file.csv
 python geofabrik_to_csv.py input_file.osm.pbf output_file.csv --max-pois 1000
 ```
 
-### Parameters:
+### Parameters
+
 - `--bounds`: Limit to specific lat/lng bounds (min_lat max_lat min_lng max_lng)
 - `--max-pois`: Limit total number of POIs extracted
 - `--zip`: Force processing as zip file
@@ -73,6 +74,7 @@ This will create a CSV file with up to 5000 POIs from the Patna area, ready for 
 ## CSV Format
 
 The generated CSV will have the following columns:
+
 - `name`: POI name
 - `category`: Standardized category
 - `latitude`: Latitude coordinate
@@ -96,6 +98,7 @@ The generated CSV will have the following columns:
 **Slow processing**: Consider using city-specific extracts instead of country/state-level files
 
 For help with the converter script:
+
 ```bash
 python geofabrik_to_csv.py --help
 ```
