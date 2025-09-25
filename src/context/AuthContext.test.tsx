@@ -102,8 +102,8 @@ describe('AuthContext', () => {
         role: 'user',
         privacyLevel: 'medium',
         locationDataPermission: [],
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: { toDate: () => new Date() },
+        updatedAt: { toDate: () => new Date() }
       })
     } as any);
 
@@ -140,8 +140,8 @@ describe('AuthContext', () => {
         role: 'user',
         privacyLevel: 'medium',
         locationDataPermission: [],
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: { toDate: () => new Date() },
+        updatedAt: { toDate: () => new Date() }
       })
     } as any);
 

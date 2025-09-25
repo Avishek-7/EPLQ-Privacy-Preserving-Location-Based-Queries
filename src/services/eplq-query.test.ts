@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { EPLQQueryService, type QueryResult } from './eplq-query';
+import { getDocs } from 'firebase/firestore';
 
 // Mock the crypto module
 vi.mock('../lib/encryption/eplq-crypto', () => ({
@@ -43,6 +44,8 @@ vi.mock('firebase/firestore', () => ({
   collection: vi.fn(),
   query: vi.fn(),
   where: vi.fn(),
+  orderBy: vi.fn(),
+  limit: vi.fn(),
   getDocs: vi.fn(),
   doc: vi.fn(),
   addDoc: vi.fn(),
@@ -107,21 +110,26 @@ describe('EPLQQueryService', () => {
       // Mock successful initialization
       vi.mocked(eplqCrypto.isInitialized).mockReturnValue(true);
       
-      // Mock Firestore response
-      vi.mocked(getDocs).mockResolvedValue({
-        docs: [
-          {
-            id: 'poi-1',
-            data: () => ({
-              name: 'Test Restaurant',
-              category: 'restaurant',
-              latitude: 25.6093,
-              longitude: 85.1376,
-              description: 'A test restaurant'
-            })
-          }
-        ]
-      } as any);
+      // Mock Firestore response with proper QuerySnapshot interface
+      const mockDoc = {
+        id: 'poi-1',
+        data: () => ({
+          name: 'Test Restaurant',
+          category: 'restaurant',
+          latitude: 25.6093,
+          longitude: 85.1376,
+          description: 'A test restaurant'
+        })
+      };
+      
+      const mockQuerySnapshot = {
+        docs: [mockDoc],
+        forEach: vi.fn((callback) => [mockDoc].forEach(callback)),
+        size: 1,
+        empty: false
+      };
+      
+      vi.mocked(getDocs).mockResolvedValue(mockQuerySnapshot as any);
 
       // Mock crypto range query execution
       vi.mocked(eplqCrypto.executeRangeQuery).mockResolvedValue([
@@ -170,9 +178,14 @@ describe('EPLQQueryService', () => {
       
       vi.mocked(eplqCrypto.isInitialized).mockReturnValue(true);
       
-      vi.mocked(getDocs).mockResolvedValue({
-        docs: []
-      } as any);
+      const emptyQuerySnapshot = {
+        docs: [],
+        forEach: vi.fn((callback) => [].forEach(callback)),
+        size: 0,
+        empty: true
+      };
+      
+      vi.mocked(getDocs).mockResolvedValue(emptyQuerySnapshot as any);
 
       vi.mocked(eplqCrypto.executeRangeQuery).mockResolvedValue([]);
 
@@ -218,7 +231,13 @@ describe('EPLQQueryService', () => {
       const { getDocs } = await import('firebase/firestore');
       
       vi.mocked(eplqCrypto.isInitialized).mockReturnValue(true);
-      vi.mocked(getDocs).mockResolvedValue({ docs: [] } as any);
+      const emptyQuerySnapshot = {
+        docs: [],
+        forEach: vi.fn((callback) => [].forEach(callback)),
+        size: 0,
+        empty: true
+      };
+      vi.mocked(getDocs).mockResolvedValue(emptyQuerySnapshot as any);
       vi.mocked(eplqCrypto.executeRangeQuery).mockRejectedValue(new Error('Decryption failed'));
 
       await queryService.initialize();
@@ -241,7 +260,13 @@ describe('EPLQQueryService', () => {
       const { getDocs } = await import('firebase/firestore');
       
       vi.mocked(eplqCrypto.isInitialized).mockReturnValue(true);
-      vi.mocked(getDocs).mockResolvedValue({ docs: [] } as any);
+      const emptyQuerySnapshot = {
+        docs: [],
+        forEach: vi.fn((callback) => [].forEach(callback)),
+        size: 0,
+        empty: true
+      };
+      vi.mocked(getDocs).mockResolvedValue(emptyQuerySnapshot as any);
       vi.mocked(eplqCrypto.executeRangeQuery).mockResolvedValue([]);
 
       await queryService.initialize();
@@ -264,7 +289,13 @@ describe('EPLQQueryService', () => {
       const { getDocs } = await import('firebase/firestore');
       
       vi.mocked(eplqCrypto.isInitialized).mockReturnValue(true);
-      vi.mocked(getDocs).mockResolvedValue({ docs: [] } as any);
+      const emptyQuerySnapshot = {
+        docs: [],
+        forEach: vi.fn((callback) => [].forEach(callback)),
+        size: 0,
+        empty: true
+      };
+      vi.mocked(getDocs).mockResolvedValue(emptyQuerySnapshot as any);
       vi.mocked(eplqCrypto.executeRangeQuery).mockResolvedValue([]);
 
       await queryService.initialize();
