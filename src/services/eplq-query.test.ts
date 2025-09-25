@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { EPLQQueryService, type QueryResult } from './eplq-query';
-import { getDocs } from 'firebase/firestore';
+import { EPLQQueryService } from './eplq-query';
 
 // Mock the crypto module
 vi.mock('../lib/encryption/eplq-crypto', () => ({

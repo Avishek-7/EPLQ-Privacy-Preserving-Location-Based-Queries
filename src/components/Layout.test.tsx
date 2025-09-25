@@ -1,19 +1,39 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, afterEach, vi } from 'vitest';
+import { render, screen, cleanup } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { Layout } from './Layout';
+import { AuthProvider } from '../context/AuthContext';
 
-const renderWithRouter = (component: React.ReactElement) => {
+// Mock useAuth hook
+vi.mock('../hooks/useAuth', () => ({
+  useAuth: () => ({
+    user: null,
+    profile: null,
+    loading: false,
+    login: vi.fn(),
+    logout: vi.fn(),
+    register: vi.fn()
+  })
+}));
+
+const renderWithProviders = (component: React.ReactElement) => {
   return render(
     <BrowserRouter>
-      {component}
+      <AuthProvider>
+        {component}
+      </AuthProvider>
     </BrowserRouter>
   );
 };
 
 describe('Layout Component', () => {
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
   it('renders children content', () => {
-    renderWithRouter(
+    renderWithProviders(
       <Layout>
         <div>Test Content</div>
       </Layout>
@@ -23,7 +43,7 @@ describe('Layout Component', () => {
   });
 
   it('renders header with app title', () => {
-    renderWithRouter(
+    renderWithProviders(
       <Layout>
         <div>Content</div>
       </Layout>
@@ -33,7 +53,7 @@ describe('Layout Component', () => {
   });
 
   it('applies brutalist styling', () => {
-    renderWithRouter(
+    renderWithProviders(
       <Layout>
         <div>Content</div>
       </Layout>
@@ -45,7 +65,7 @@ describe('Layout Component', () => {
   });
 
   it('has responsive layout structure', () => {
-    renderWithRouter(
+    renderWithProviders(
       <Layout>
         <div data-testid="content">Content</div>
       </Layout>
@@ -56,7 +76,7 @@ describe('Layout Component', () => {
   });
 
   it('renders navigation elements', () => {
-    renderWithRouter(
+    renderWithProviders(
       <Layout>
         <div>Content</div>
       </Layout>
@@ -67,7 +87,7 @@ describe('Layout Component', () => {
   });
 
   it('handles empty children', () => {
-    renderWithRouter(
+    renderWithProviders(
       <Layout>
         {null}
       </Layout>
@@ -78,7 +98,7 @@ describe('Layout Component', () => {
   });
 
   it('renders with multiple children', () => {
-    renderWithRouter(
+    renderWithProviders(
       <Layout>
         <div>First Child</div>
         <div>Second Child</div>
@@ -92,7 +112,7 @@ describe('Layout Component', () => {
   });
 
   it('maintains layout structure with complex content', () => {
-    renderWithRouter(
+    renderWithProviders(
       <Layout>
         <header>Header Content</header>
         <main>Main Content</main>
@@ -113,7 +133,7 @@ describe('Layout Component', () => {
       </div>
     );
 
-    renderWithRouter(
+    renderWithProviders(
       <Layout>
         <TestComponent />
       </Layout>

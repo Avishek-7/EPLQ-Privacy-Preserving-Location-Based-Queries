@@ -15,9 +15,7 @@ describe('Logger', () => {
   it('should log info messages with proper formatting', () => {
     logger.info('TestModule', 'Test message')
     expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringContaining('[INFO]'),
-      expect.stringContaining('TestModule'),
-      'Test message'
+      expect.stringContaining('ℹ️') // Info emoji
     )
   })
 

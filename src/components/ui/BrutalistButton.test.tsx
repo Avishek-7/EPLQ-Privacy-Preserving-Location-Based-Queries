@@ -1,8 +1,12 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi, afterEach } from 'vitest'
+import { render, screen, fireEvent, cleanup } from '@testing-library/react'
 import BrutalistButton from './BrutalistButton'
 
 describe('BrutalistButton', () => {
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
   it('should render with default props', () => {
     render(<BrutalistButton>Click me</BrutalistButton>)
     

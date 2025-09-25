@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import { cleanup } from '@testing-library/react'
-import { afterEach, vi } from 'vitest'
+import { afterEach, beforeEach, vi } from 'vitest'
 
 // Mock Firebase
 vi.mock('../lib/firebase', () => ({
@@ -76,7 +76,51 @@ Object.defineProperty(global.navigator, 'geolocation', {
   writable: true,
 })
 
-// Cleanup after each test
+// Enhanced cleanup after each test for memory management
 afterEach(() => {
-  cleanup()
-})
+  // Clean up DOM from React Testing Library
+  cleanup();
+  
+  // Clear all mocks to prevent memory retention
+  vi.clearAllMocks();
+  
+  // Clear any timers
+  vi.clearAllTimers();
+  
+  // Reset modules to prevent state leakage between tests
+  vi.resetModules();
+  
+  // Force garbage collection if available (Node.js with --expose-gc)
+  if (global.gc) {
+    global.gc();
+  }
+});
+
+// Set up memory-efficient mocks
+beforeEach(() => {
+  // Mock console methods to prevent spam during tests
+  vi.spyOn(console, 'warn').mockImplementation(() => {});
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+  
+  // Mock window.matchMedia for responsive components
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: vi.fn().mockImplementation(query => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+  
+  // Mock IntersectionObserver for scroll-based components
+  global.IntersectionObserver = vi.fn().mockImplementation(() => ({
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
+  }));
+});

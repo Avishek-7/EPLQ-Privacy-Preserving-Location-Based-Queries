@@ -1,8 +1,12 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import BrutalistInput from './BrutalistInput';
 
 describe('BrutalistInput Component', () => {
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
   it('renders input with label', () => {
     render(
       <BrutalistInput
