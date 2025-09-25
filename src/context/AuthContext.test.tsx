@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { act } from '@testing-library/react';
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { AuthProvider, AuthContext, type EPLQUserProfiles } from '../context/AuthContext';
 
 // Mock Firebase
@@ -54,8 +54,12 @@ describe('AuthContext', () => {
 
   it('provides auth context to children', async () => {
     const { onAuthStateChanged } = await import('firebase/auth');
-    vi.mocked(onAuthStateChanged).mockImplementation((auth, callback) => {
-      callback(null);
+    vi.mocked(onAuthStateChanged).mockImplementation((_auth, callback) => {
+      if (typeof callback === 'function') {
+        if (typeof callback === 'function') {
+        callback(null);
+      }
+      }
       return vi.fn(); // unsubscribe function
     });
 
@@ -80,8 +84,12 @@ describe('AuthContext', () => {
     const { onAuthStateChanged } = await import('firebase/auth');
     const { getDoc } = await import('firebase/firestore');
     
-    vi.mocked(onAuthStateChanged).mockImplementation((auth, callback) => {
-      setTimeout(() => callback(mockUser as any), 0);
+    vi.mocked(onAuthStateChanged).mockImplementation((_auth, callback) => {
+      setTimeout(() => {
+        if (typeof callback === 'function') {
+          callback(mockUser as any);
+        }
+      }, 0);
       return vi.fn();
     });
 
@@ -138,8 +146,12 @@ describe('AuthContext', () => {
     } as any);
 
     const { onAuthStateChanged } = await import('firebase/auth');
-    vi.mocked(onAuthStateChanged).mockImplementation((auth, callback) => {
-      callback(null);
+    vi.mocked(onAuthStateChanged).mockImplementation((_auth, callback) => {
+      if (typeof callback === 'function') {
+        if (typeof callback === 'function') {
+        callback(null);
+      }
+      }
       return vi.fn();
     });
 
@@ -168,8 +180,12 @@ describe('AuthContext', () => {
     vi.mocked(signOut).mockResolvedValue();
 
     const { onAuthStateChanged } = await import('firebase/auth');
-    vi.mocked(onAuthStateChanged).mockImplementation((auth, callback) => {
-      callback(null);
+    vi.mocked(onAuthStateChanged).mockImplementation((_auth, callback) => {
+      if (typeof callback === 'function') {
+        if (typeof callback === 'function') {
+        callback(null);
+      }
+      }
       return vi.fn();
     });
 
@@ -205,8 +221,10 @@ describe('AuthContext', () => {
     vi.mocked(setDoc).mockResolvedValue();
 
     const { onAuthStateChanged } = await import('firebase/auth');
-    vi.mocked(onAuthStateChanged).mockImplementation((auth, callback) => {
-      callback(null);
+    vi.mocked(onAuthStateChanged).mockImplementation((_auth, callback) => {
+      if (typeof callback === 'function') {
+        callback(null);
+      }
       return vi.fn();
     });
 
@@ -256,7 +274,7 @@ describe('AuthContext', () => {
     const { onAuthStateChanged } = await import('firebase/auth');
     
     let authCallback: any;
-    vi.mocked(onAuthStateChanged).mockImplementation((auth, callback) => {
+    vi.mocked(onAuthStateChanged).mockImplementation((_auth, callback) => {
       authCallback = callback;
       return vi.fn();
     });
@@ -286,11 +304,13 @@ describe('AuthContext', () => {
     vi.mocked(updateDoc).mockResolvedValue();
 
     const { onAuthStateChanged } = await import('firebase/auth');
-    vi.mocked(onAuthStateChanged).mockImplementation((auth, callback) => {
-      callback({
-        uid: 'test-uid',
-        email: 'test@example.com'
-      } as any);
+    vi.mocked(onAuthStateChanged).mockImplementation((_auth, callback) => {
+      if (typeof callback === 'function') {
+        callback({
+          uid: 'test-uid',
+          email: 'test@example.com'
+        } as any);
+      }
       return vi.fn();
     });
 
@@ -326,8 +346,10 @@ describe('AuthContext', () => {
 
   it('handles location access request', async () => {
     const { onAuthStateChanged } = await import('firebase/auth');
-    vi.mocked(onAuthStateChanged).mockImplementation((auth, callback) => {
-      callback(null);
+    vi.mocked(onAuthStateChanged).mockImplementation((_auth, callback) => {
+      if (typeof callback === 'function') {
+        callback(null);
+      }
       return vi.fn();
     });
 

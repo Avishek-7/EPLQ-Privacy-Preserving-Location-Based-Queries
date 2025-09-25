@@ -6,16 +6,27 @@ vi.mock('../lib/encryption/eplq-crypto', () => ({
   eplqCrypto: {
     isInitialized: vi.fn().mockReturnValue(false),
     initialize: vi.fn().mockResolvedValue(undefined),
-    encryptPoint: vi.fn().mockResolvedValue({
-      encryptedX: 'encrypted-x',
-      encryptedY: 'encrypted-y',
-      proof: 'point-proof'
-    }),
-    encryptPredicate: vi.fn().mockResolvedValue({
+    encryptQuery: vi.fn().mockResolvedValue({
       encryptedPredicate: 'encrypted-predicate',
-      proof: 'predicate-proof'
+      queryToken: 'test-token',
+      iv: 'test-iv',
+      timestamp: Date.now()
     }),
-    decrypt: vi.fn().mockResolvedValue([
+    encryptPOI: vi.fn().mockResolvedValue({
+      encryptedCoords: 'encrypted-coords',
+      spatialIndex: 'test-index',
+      predicateHash: 'test-hash',
+      iv: 'test-iv',
+      timestamp: Date.now()
+    }),
+    decryptPOI: vi.fn().mockResolvedValue({
+      name: 'Test POI',
+      category: 'restaurant',
+      latitude: 25.6093,
+      longitude: 85.1376,
+      description: 'Test restaurant'
+    }),
+    executeRangeQuery: vi.fn().mockResolvedValue([
       {
         name: 'Test POI',
         category: 'restaurant',
@@ -112,8 +123,8 @@ describe('EPLQQueryService', () => {
         ]
       } as any);
 
-      // Mock crypto decryption
-      vi.mocked(eplqCrypto.decrypt).mockResolvedValue([
+      // Mock crypto range query execution
+      vi.mocked(eplqCrypto.executeRangeQuery).mockResolvedValue([
         {
           name: 'Test Restaurant',
           category: 'restaurant',
@@ -126,13 +137,13 @@ describe('EPLQQueryService', () => {
       await queryService.initialize();
 
       const predicate = {
-        centerX: 25.6093,
-        centerY: 85.1376,
+        centerLat: 25.6093,
+        centerLng: 85.1376,
         radius: 1000,
         category: 'restaurant'
       };
 
-      const result = await queryService.executeRangeQuery(predicate, 10);
+      const result = await queryService.executeRangeQuery(predicate, 'test-user', 10);
 
       expect(result).toBeDefined();
       expect(result.results).toHaveLength(1);
@@ -141,13 +152,13 @@ describe('EPLQQueryService', () => {
 
     it('handles uninitialized service', async () => {
       const predicate = {
-        centerX: 25.6093,
-        centerY: 85.1376,
+        centerLat: 25.6093,
+        centerLng: 85.1376,
         radius: 1000,
         category: 'restaurant'
       };
 
-      await expect(queryService.executeRangeQuery(predicate, 10))
+      await expect(queryService.executeRangeQuery(predicate, 'test-user', 10))
         .rejects.toThrow('Query service not initialized');
     });
   });
@@ -163,22 +174,18 @@ describe('EPLQQueryService', () => {
         docs: []
       } as any);
 
-      vi.mocked(eplqCrypto.decrypt).mockResolvedValue([]);
+      vi.mocked(eplqCrypto.executeRangeQuery).mockResolvedValue([]);
 
       await queryService.initialize();
 
-      const encryptedPoint = {
-        encryptedX: 'encrypted-x',
-        encryptedY: 'encrypted-y',
-        proof: 'point-proof'
+      const predicate = {
+        centerLat: 25.6093,
+        centerLng: 85.1376,
+        radius: 1000,
+        category: 'restaurant'
       };
 
-      const result = await queryService.executeRangeQueryWithEncryptedPoint(
-        encryptedPoint, 
-        1000, 
-        'restaurant', 
-        10
-      );
+      const result = await queryService.executeRangeQuery(predicate, 'test-user', 10);
 
       expect(result).toBeDefined();
       expect(result.results).toEqual([]);
@@ -196,14 +203,14 @@ describe('EPLQQueryService', () => {
       await queryService.initialize();
 
       const predicate = {
-        centerX: 25.6093,
-        centerY: 85.1376,
+        centerLat: 25.6093,
+        centerLng: 85.1376,
         radius: 1000,
         category: 'restaurant'
       };
 
-      await expect(queryService.executeRangeQuery(predicate, 10))
-        .rejects.toThrow('Database error');
+      await expect(queryService.executeRangeQuery(predicate, 'test-user', 10))
+        .rejects.toThrow('Query execution failed');
     });
 
     it('handles decryption errors', async () => {
@@ -212,19 +219,19 @@ describe('EPLQQueryService', () => {
       
       vi.mocked(eplqCrypto.isInitialized).mockReturnValue(true);
       vi.mocked(getDocs).mockResolvedValue({ docs: [] } as any);
-      vi.mocked(eplqCrypto.decrypt).mockRejectedValue(new Error('Decryption failed'));
+      vi.mocked(eplqCrypto.executeRangeQuery).mockRejectedValue(new Error('Decryption failed'));
 
       await queryService.initialize();
 
       const predicate = {
-        centerX: 25.6093,
-        centerY: 85.1376,
+        centerLat: 25.6093,
+        centerLng: 85.1376,
         radius: 1000,
         category: 'restaurant'
       };
 
-      await expect(queryService.executeRangeQuery(predicate, 10))
-        .rejects.toThrow('Decryption failed');
+      await expect(queryService.executeRangeQuery(predicate, 'test-user', 10))
+        .rejects.toThrow('Query execution failed');
     });
   });
 
@@ -235,18 +242,18 @@ describe('EPLQQueryService', () => {
       
       vi.mocked(eplqCrypto.isInitialized).mockReturnValue(true);
       vi.mocked(getDocs).mockResolvedValue({ docs: [] } as any);
-      vi.mocked(eplqCrypto.decrypt).mockResolvedValue([]);
+      vi.mocked(eplqCrypto.executeRangeQuery).mockResolvedValue([]);
 
       await queryService.initialize();
 
       const predicate = {
-        centerX: 25.6093,
-        centerY: 85.1376,
+        centerLat: 25.6093,
+        centerLng: 85.1376,
         radius: 1000,
         category: 'restaurant'
       };
 
-      const result = await queryService.executeRangeQuery(predicate, 10);
+      const result = await queryService.executeRangeQuery(predicate, 'test-user', 10);
 
       expect(result.executionTime).toBeTypeOf('number');
       expect(result.executionTime).toBeGreaterThanOrEqual(0);
@@ -258,19 +265,19 @@ describe('EPLQQueryService', () => {
       
       vi.mocked(eplqCrypto.isInitialized).mockReturnValue(true);
       vi.mocked(getDocs).mockResolvedValue({ docs: [] } as any);
-      vi.mocked(eplqCrypto.decrypt).mockResolvedValue([]);
+      vi.mocked(eplqCrypto.executeRangeQuery).mockResolvedValue([]);
 
       await queryService.initialize();
 
       const predicate = {
-        centerX: 25.6093,
-        centerY: 85.1376,
+        centerLat: 25.6093,
+        centerLng: 85.1376,
         radius: 1000,
         category: 'restaurant'
       };
 
-      const result1 = await queryService.executeRangeQuery(predicate, 10);
-      const result2 = await queryService.executeRangeQuery(predicate, 10);
+      const result1 = await queryService.executeRangeQuery(predicate, 'test-user', 10);
+      const result2 = await queryService.executeRangeQuery(predicate, 'test-user', 10);
 
       expect(result1.queryId).toBeTypeOf('string');
       expect(result2.queryId).toBeTypeOf('string');

@@ -26,11 +26,34 @@ vi.mock('../lib/encryption/eplq-crypto', () => ({
     initialize: vi.fn().mockResolvedValue(true),
     isInitialized: vi.fn().mockReturnValue(true),
     encryptPOI: vi.fn().mockResolvedValue({
-      encryptedLat: 'encrypted_lat',
-      encryptedLng: 'encrypted_lng',
-      geohash: 'test_geohash',
+      encryptedCoords: 'encrypted_coords',
       spatialIndex: 'test_index',
+      predicateHash: 'test_hash',
+      iv: 'test_iv',
+      timestamp: Date.now(),
     }),
+    encryptQuery: vi.fn().mockResolvedValue({
+      encryptedPredicate: 'encrypted_predicate',
+      queryToken: 'test_token',
+      iv: 'test_iv',
+      timestamp: Date.now(),
+    }),
+    decryptPOI: vi.fn().mockResolvedValue({
+      name: 'Test POI',
+      category: 'restaurant',
+      latitude: 25.6093,
+      longitude: 85.1376,
+      description: 'Test description',
+    }),
+    decrypt: vi.fn().mockResolvedValue([
+      {
+        name: 'Test POI',
+        category: 'restaurant',
+        latitude: 25.6093,
+        longitude: 85.1376,
+        description: 'Test description',
+      }
+    ]),
     executeQuery: vi.fn().mockResolvedValue([]),
     clearPersistedKeys: vi.fn().mockResolvedValue(true),
   },
