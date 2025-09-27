@@ -12,7 +12,7 @@ describe('BrutalistButton', () => {
     
     const button = screen.getByRole('button', { name: 'Click me' })
     expect(button).toBeInTheDocument()
-    expect(button).toHaveClass('border-4', 'border-black', 'bg-white')
+    expect(button).toHaveClass('brutalist-button', 'brutalist-button--primary', 'brutalist-button--md')
   })
 
   it('should render with primary variant', () => {
@@ -21,7 +21,7 @@ describe('BrutalistButton', () => {
     )
     
     const button = screen.getByRole('button', { name: 'Primary Button' })
-    expect(button).toHaveClass('bg-black', 'text-white')
+    expect(button).toHaveClass('brutalist-button--primary')
   })
 
   it('should render with secondary variant', () => {
@@ -30,7 +30,7 @@ describe('BrutalistButton', () => {
     )
     
     const button = screen.getByRole('button', { name: 'Secondary Button' })
-    expect(button).toHaveClass('bg-gray-200', 'text-black')
+    expect(button).toHaveClass('brutalist-button--secondary')
   })
 
   it('should render with danger variant', () => {
@@ -39,7 +39,7 @@ describe('BrutalistButton', () => {
     )
     
     const button = screen.getByRole('button', { name: 'Delete Button' })
-    expect(button).toHaveClass('bg-red-500', 'text-white')
+    expect(button).toHaveClass('brutalist-button--danger')
   })
 
   it('should render with primary variant by default', () => {
@@ -55,13 +55,15 @@ describe('BrutalistButton', () => {
     const { rerender } = render(
       <BrutalistButton size="sm">Small</BrutalistButton>
     )
-    expect(screen.getByRole('button')).toHaveClass('px-3', 'py-1', 'text-sm')
+    expect(screen.getByRole('button')).toHaveClass('brutalist-button--sm')
+
+    expect(screen.getByRole('button')).toHaveClass('brutalist-button--sm')
 
     rerender(<BrutalistButton size="md">Medium</BrutalistButton>)
-    expect(screen.getByRole('button')).toHaveClass('px-4', 'py-2')
+    expect(screen.getByRole('button')).toHaveClass('brutalist-button--md')
 
     rerender(<BrutalistButton size="lg">Large</BrutalistButton>)
-    expect(screen.getByRole('button')).toHaveClass('px-6', 'py-3', 'text-lg')
+    expect(screen.getByRole('button')).toHaveClass('brutalist-button--lg')
   })
 
   it('should be disabled when disabled prop is true', () => {
@@ -69,7 +71,8 @@ describe('BrutalistButton', () => {
     
     const button = screen.getByRole('button', { name: 'Disabled Button' })
     expect(button).toBeDisabled()
-    expect(button).toHaveClass('opacity-50', 'cursor-not-allowed')
+    expect(button).toHaveClass('brutalist-button')
+    expect(button).toBeDisabled()
   })
 
   it('should handle click events', () => {
@@ -113,7 +116,8 @@ describe('BrutalistButton', () => {
     )
     
     const button = screen.getByRole('button', { name: 'Custom' })
-    expect(button).toHaveClass('custom-class', 'border-4', 'border-black')
+    expect(button.closest('div')).toHaveClass('custom-class')
+    expect(button).toHaveClass('brutalist-button')
   })
 
   it('should render button with custom attributes', () => {

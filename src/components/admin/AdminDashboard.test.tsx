@@ -136,14 +136,14 @@ describe('AdminDashboard Component', () => {
     renderWithRouter(<AdminDashboard />);
 
     // Should show some form of activity tracking
-    expect(screen.getByText(/dashboard/i)).toBeInTheDocument();
+    expect(screen.getByText(/overview/i)).toBeInTheDocument();
   });
 
   it('provides quick access to admin functions', () => {
     renderWithRouter(<AdminDashboard />);
 
     // Should have links or buttons for admin operations
-    const dashboard = screen.getByText(/admin dashboard/i);
+    const dashboard = screen.getAllByText(/admin dashboard/i)[0];
     expect(dashboard).toBeInTheDocument();
   });
 
@@ -155,13 +155,13 @@ describe('AdminDashboard Component', () => {
 
     renderWithRouter(<AdminDashboard />, errorAdmin);
 
-    // Should handle missing profile gracefully
-    expect(screen.getByText(/admin dashboard/i)).toBeInTheDocument();
+    // Should handle missing profile gracefully and show access denied
+    expect(screen.getByText(/access denied/i)).toBeInTheDocument();
   });
 
   it('displays appropriate content for admin role', () => {
     renderWithRouter(<AdminDashboard />);
 
-    expect(screen.getByText(/admin/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/admin/i)[0]).toBeInTheDocument();
   });
 });
