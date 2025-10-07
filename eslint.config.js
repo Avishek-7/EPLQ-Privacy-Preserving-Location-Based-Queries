@@ -19,5 +19,17 @@ export default tseslint.config([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // Allow mixed exports in specific files that intentionally export non-components
+      'react-refresh/only-export-components': 'off',
+    },
+  },
+  // Test files: relax strict typing rules and react-refresh constraints
+  {
+    files: ['**/*.test.{ts,tsx}', '**/test/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      'react-refresh/only-export-components': 'off',
+    },
   },
 ])

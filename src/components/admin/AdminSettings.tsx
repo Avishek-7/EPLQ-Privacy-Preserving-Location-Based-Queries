@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import { BrutalistButton } from '../ui';
 
 const AdminSettings: React.FC = () => {
     const [settings, setSettings] = useState({
@@ -67,50 +68,48 @@ const AdminSettings: React.FC = () => {
             {/* Header */}
             <div className="flex justify-between items-center">
                 <div>
-                    <h2 className="text-3xl font-bold text-gray-900">System Settings</h2>
-                    <p className="text-gray-600 mt-2">Configure EPLQ system parameters and privacy settings</p>
+                    <h2 className="text-3xl font-black text-gray-900 mb-2">⚙️ System Settings</h2>
+                    <p className="text-gray-600 font-semibold">Configure EPLQ system parameters and privacy settings</p>
                 </div>
                 <div className="flex space-x-3">
-                    <button
+                    <BrutalistButton
                         onClick={resetToDefaults}
-                        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                        variant="secondary"
+                        size="sm"
                     >
-                        Reset to Defaults
-                    </button>
-                    <button
+                        🔄 Reset to Defaults
+                    </BrutalistButton>
+                    <BrutalistButton
                         onClick={saveSettings}
                         disabled={saving}
-                        className={`px-6 py-2 rounded-md font-medium transition-colors ${
-                            saving
-                                ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                                : 'bg-blue-600 text-white hover:bg-blue-700'
-                        }`}
+                        variant="primary"
+                        size="sm"
                     >
-                        {saving ? 'Saving...' : 'Save Settings'}
-                    </button>
+                        {saving ? '⏳ Saving...' : '💾 Save Settings'}
+                    </BrutalistButton>
                 </div>
             </div>
 
             {/* Save Message */}
             {saveMessage && (
-                <div className={`p-4 rounded-lg ${
+                <div className={`p-4 rounded-xl border-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
                     saveMessage.includes('Error')
-                        ? 'bg-red-50 border border-red-200 text-red-800'
-                        : 'bg-green-50 border border-green-200 text-green-800'
+                        ? 'bg-red-50 border-red-200 text-red-800'
+                        : 'bg-green-50 border-green-200 text-green-800'
                 }`}>
-                    {saveMessage}
+                    <p className="font-black">{saveMessage}</p>
                 </div>
             )}
 
             {/* Query Configuration */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <div className="bg-white rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6">
+                <h3 className="text-lg font-black text-gray-900 mb-4 flex items-center">
                     <span className="mr-2">🔍</span>
                     Query Configuration
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-black text-gray-700 mb-2 uppercase tracking-wide">
                             Maximum Query Radius (meters)
                         </label>
                         <input
@@ -119,7 +118,7 @@ const AdminSettings: React.FC = () => {
                             max="50000"
                             value={settings.maxQueryRadius}
                             onChange={(e) => handleSettingChange('maxQueryRadius', Number(e.target.value))}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-semibold"
                         />
                         <p className="text-xs text-gray-500 mt-1">Maximum distance for spatial range queries</p>
                     </div>
