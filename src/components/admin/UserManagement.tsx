@@ -26,17 +26,31 @@ const UserManagement: React.FC = () => {
             );
             const usersSnapshot = await getDocs(usersQuery);
             
-            const usersData: EPLQUserProfiles[] = usersSnapshot.docs.map(doc => {
+            const usersData: EPLQUserProfiles[] = usersSnapshot.docs.map((doc) => {
                 const data = doc.data();
+
+                // Helper to detect Firestore Timestamp-like objects
+                const isTimestampLike = (val: unknown): val is { toDate: () => Date } =>
+                    typeof val === 'object' && val !== null && 'toDate' in (val as Record<string, unknown>);
                 const userData = {
                     ...data,
                     role: data.role || 'user', // Ensure role has a default value
                     createdAt: data.createdAt?.toDate() || new Date(),
                     updatedAt: data.updatedAt?.toDate() || new Date(),
-                    queryHistory: data.queryHistory?.map((record: any) => ({
-                        ...record,
-                        timestamp: record.timestamp?.toDate() || new Date()
-                    })) || []
+                    queryHistory: Array.isArray(data.queryHistory)
+                        ? data.queryHistory.map((record: unknown) => {
+                            const r = record as { query: string; timestamp?: { toDate: () => Date } | Date; response?: string };
+                            return {
+                                query: r.query,
+                                response: r.response,
+                                timestamp: r.timestamp
+                                    ? (isTimestampLike(r.timestamp)
+                                        ? r.timestamp.toDate()
+                                        : (r.timestamp as Date))
+                                    : new Date(),
+                            };
+                        })
+                        : []
                 } as EPLQUserProfiles;
                 
                 // Debug logging
@@ -170,7 +184,7 @@ const UserManagement: React.FC = () => {
                         <div>
                             <select
                                 value={filterRole}
-                                onChange={(e) => setFilterRole(e.target.value as any)}
+                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterRole(e.target.value as 'all' | 'user' | 'admin')}
                                 className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-semibold"
                             >
                                 <option value="all">All Roles ({users.length})</option>

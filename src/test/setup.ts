@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 import { cleanup } from '@testing-library/react'
 import { afterEach, beforeEach, vi } from 'vitest'
 
-// Mock Firebase
+// Mock Firebase app-level exports used by the app code
 vi.mock('../lib/firebase', () => ({
   auth: {
     onAuthStateChanged: vi.fn(),
@@ -18,6 +18,20 @@ vi.mock('../lib/firebase', () => ({
     getDocs: vi.fn(),
     writeBatch: vi.fn(),
   },
+}))
+
+// Mock firebase/auth module functions used directly
+vi.mock('firebase/auth', () => ({
+  onAuthStateChanged: vi.fn((_auth, callback) => {
+    // Immediately call with null user by default
+    if (typeof callback === 'function') callback(null)
+    // Return unsubscribe mock
+    return vi.fn()
+  }),
+  signInWithEmailAndPassword: vi.fn(),
+  createUserWithEmailAndPassword: vi.fn(),
+  signOut: vi.fn(),
+  updateProfile: vi.fn(),
 }))
 
 // Mock EPLQ Crypto

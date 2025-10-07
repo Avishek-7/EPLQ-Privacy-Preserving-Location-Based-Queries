@@ -10,34 +10,35 @@ vi.mock('../../lib/firebase', () => ({
   db: {},
 }));
 
+// Mock user data
+const mockUser = {
+  uid: 'user123',
+  email: 'user@eplq.com',
+  displayName: 'Test User'
+} as any;
+
+const mockUserProfile = {
+  uid: 'user123',
+  email: 'user@eplq.com',
+  displayName: 'Test User',
+  role: 'user' as const,
+  privacyLevel: 'medium' as const,
+  locationDataPermission: ['query'],
+  queryHistory: [],
+  createdAt: new Date(),
+  updatedAt: new Date()
+};
+
 const mockAuthContextValue: EPLQAuthContextType = {
-  user: {
-    uid: 'test-uid',
-    email: 'test@example.com'
-  } as any,
-  userProfile: {
-    uid: 'test-uid',
-    email: 'test@example.com',
-    displayName: 'Test User',
-    role: 'user' as const,
-    privacyLevel: 'medium' as const,
-    locationDataPermission: ['gps'],
-    queryHistory: [
-      {
-        query: 'restaurants near me',
-        timestamp: new Date('2024-01-01'),
-        response: 'Found 5 restaurants'
-      }
-    ],
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-01-01')
-  },
-  register: vi.fn(),
-  login: vi.fn(),
-  logout: vi.fn(),
-  updateUserProfile: vi.fn(),
-  requestLocationAccess: vi.fn(),
-  loading: false
+    user: mockUser,
+    userProfile: mockUserProfile,
+    register: vi.fn(),
+    login: vi.fn(),
+    logout: vi.fn(),
+    updateUserProfile: vi.fn(),
+    requestLocationAccess: vi.fn().mockResolvedValue(true),
+    addQueryToHistory: vi.fn().mockResolvedValue(undefined),
+    loading: false,
 };
 
 const MockAuthProvider = ({ 

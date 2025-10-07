@@ -22,27 +22,34 @@ vi.mock('firebase/firestore', () => ({
   limit: vi.fn(),
 }));
 
+// Mock user data
+const mockUser = {
+  uid: 'admin123',
+  email: 'admin@eplq.com',
+  displayName: 'Admin User'
+} as any;
+
+const mockAdminProfile = {
+  uid: 'admin123',
+  email: 'admin@eplq.com',
+  displayName: 'Admin User',
+  role: 'admin' as const,
+  privacyLevel: 'medium' as const,
+  locationDataPermission: ['query', 'analytics'],
+  createdAt: new Date(),
+  updatedAt: new Date()
+};
+
 const mockAdminAuthContextValue: EPLQAuthContextType = {
-  user: {
-    uid: 'admin-uid',
-    email: 'admin@example.com'
-  } as any,
-  userProfile: {
-    uid: 'admin-uid',
-    email: 'admin@example.com',
-    displayName: 'Admin User',
-    role: 'admin' as const,
-    privacyLevel: 'medium' as const,
-    locationDataPermission: ['gps'],
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-01-01')
-  },
-  register: vi.fn(),
-  login: vi.fn(),
-  logout: vi.fn(),
-  updateUserProfile: vi.fn(),
-  requestLocationAccess: vi.fn(),
-  loading: false
+    user: mockUser,
+    userProfile: mockAdminProfile,
+    register: vi.fn(),
+    login: vi.fn(),
+    logout: vi.fn(),
+    updateUserProfile: vi.fn(),
+    requestLocationAccess: vi.fn().mockResolvedValue(true),
+    addQueryToHistory: vi.fn().mockResolvedValue(undefined),
+    loading: false,
 };
 
 const MockAuthProvider = ({ 

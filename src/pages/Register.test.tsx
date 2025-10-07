@@ -7,14 +7,15 @@ import { AuthContext, type EPLQAuthContextType } from '../context/AuthContext';
 // Mock the auth context
 const mockRegister = vi.fn();
 const mockAuthContextValue: EPLQAuthContextType = {
-  user: null,
-  userProfile: null,
-  register: mockRegister,
-  login: vi.fn(),
-  logout: vi.fn(),
-  updateUserProfile: vi.fn(),
-  requestLocationAccess: vi.fn(),
-  loading: false
+    user: null,
+    userProfile: null,
+    register: vi.fn(),
+    login: vi.fn(),
+    logout: vi.fn(),
+    updateUserProfile: vi.fn(),
+    requestLocationAccess: vi.fn(),
+    addQueryToHistory: vi.fn().mockResolvedValue(undefined),
+    loading: false,
 };
 
 const MockAuthProvider = ({ children }: { children: React.ReactNode }) => (

@@ -14,14 +14,15 @@ vi.mock('react-router-dom', async () => {
 });
 
 const mockAuthContextValue: EPLQAuthContextType = {
-  user: null,
-  userProfile: null,
-  register: vi.fn(),
-  login: vi.fn(),
-  logout: vi.fn(),
-  updateUserProfile: vi.fn(),
-  requestLocationAccess: vi.fn(),
-  loading: false
+    user: null,
+    userProfile: null,
+    register: vi.fn(),
+    login: vi.fn(),
+    logout: vi.fn(),
+    updateUserProfile: vi.fn(),
+    requestLocationAccess: vi.fn(),
+    addQueryToHistory: vi.fn().mockResolvedValue(undefined),
+    loading: false,
 };
 
 const MockAuthProvider = ({ 
