@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import { BrutalistButton } from '../ui';
 
 interface EncryptedPOI {
     id: string;
@@ -80,28 +81,29 @@ const EncryptedDataViewer: React.FC = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h2 className="text-3xl font-bold text-gray-900">Encrypted Data Viewer</h2>
-                    <p className="text-gray-600 mt-2">View encrypted POI data with privacy preservation</p>
+                    <h2 className="text-3xl font-black text-gray-900 mb-2">🔒 Encrypted Data Viewer</h2>
+                    <p className="text-gray-600 font-semibold">View encrypted POI data with privacy preservation</p>
                 </div>
-                <button
+                <BrutalistButton
                     onClick={loadEncryptedPOIs}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                    variant="secondary"
+                    size="sm"
                 >
-                    Refresh
-                </button>
+                    🔄 Refresh
+                </BrutalistButton>
             </div>
 
             {/* Security Warning */}
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <div className="bg-amber-50 border-2 border-amber-200 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4">
                 <div className="flex">
                     <div className="flex-shrink-0">
                         <span className="text-2xl">⚠️</span>
                     </div>
                     <div className="ml-3">
-                        <h3 className="text-sm font-medium text-amber-800">
+                        <h3 className="text-sm font-black text-amber-800">
                             Privacy Protected Data
                         </h3>
-                        <div className="mt-2 text-sm text-amber-700">
+                        <div className="mt-2 text-sm text-amber-700 font-semibold">
                             <p>
                                 This data is encrypted using EPLQ algorithms. Preview decryption is only available 
                                 for demonstration purposes and requires proper decryption keys in production.
@@ -112,13 +114,13 @@ const EncryptedDataViewer: React.FC = () => {
             </div>
 
             {/* Search */}
-            <div className="bg-white p-4 rounded-lg shadow-md">
+            <div className="bg-white rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4">
                 <input
                     type="text"
                     placeholder="Search encrypted POI data..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-semibold"
                 />
             </div>
 
@@ -127,7 +129,7 @@ const EncryptedDataViewer: React.FC = () => {
                 {filteredPOIs.map((poi) => (
                     <div 
                         key={poi.id} 
-                        className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                        className="bg-white rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all duration-200 cursor-pointer"
                         onClick={() => setSelectedPOI(poi)}
                     >
                         <div className="space-y-3">
@@ -261,8 +263,8 @@ const EncryptedDataViewer: React.FC = () => {
             )}
 
             {/* Summary */}
-            <div className="bg-white p-4 rounded-lg shadow-md">
-                <p className="text-sm text-gray-600">
+            <div className="bg-white rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4">
+                <p className="text-sm text-gray-600 font-semibold">
                     Showing {filteredPOIs.length} of {pois.length} encrypted POI records
                 </p>
             </div>

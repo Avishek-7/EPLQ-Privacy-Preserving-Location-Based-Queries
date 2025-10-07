@@ -17,7 +17,7 @@ interface SearchLocation {
 }
 
 export const POISearch: React.FC = () => {
-    const { user } = useAuth();
+    const { user, addQueryToHistory } = useAuth();
     const [searchLocation, setSearchLocation] = useState<SearchLocation | null>(null);
     const [searchRadius, setSearchRadius] = useState<number>(1000); // meters
     const [searchCategory, setSearchCategory] = useState<string>('');
@@ -155,6 +155,11 @@ export const POISearch: React.FC = () => {
             
             setSearchResults(result.results);
             setQueryResult(result);
+            
+            // Save query to user history
+            const queryDescription = `POI Search: ${searchCategory || 'all categories'} within ${searchRadius}m of ${searchLocation.latitude.toFixed(4)}, ${searchLocation.longitude.toFixed(4)}`;
+            const responseSummary = `Found ${result.results.length} POIs in ${result.executionTime}ms`;
+            await addQueryToHistory(queryDescription, responseSummary);
             
             logger.success('POISearch', `✅ Search completed successfully`, {
                 results: result.results.length,

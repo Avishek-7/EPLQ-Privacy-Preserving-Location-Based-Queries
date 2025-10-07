@@ -30,7 +30,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, title = 'EPLQ' }) => {
     const isActive = (path: string) => location.pathname === path;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 relative overflow-hidden">
+        <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 relative overflow-hidden flex flex-col">
             {/* Background decorative elements */}
             <div className="absolute top-10 left-10 w-60 h-60 bg-emerald-200/20 rounded-full blur-3xl"></div>
             <div className="absolute bottom-10 right-10 w-80 h-80 bg-blue-200/20 rounded-full blur-3xl"></div>
@@ -207,7 +207,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, title = 'EPLQ' }) => {
             </nav>
 
             {/* Main Content */}
-            <main className="flex-1 relative z-10">
+            <main className="flex-1 relative z-10 flex flex-col">
                 {children}
             </main>
         </div>

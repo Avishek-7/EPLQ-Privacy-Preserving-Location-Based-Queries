@@ -37,6 +37,7 @@ export interface EPLQAuthContextType {
     logout: () => Promise<void>;
     updateUserProfile: (settings: PrivacySettings) => Promise<void>;
     requestLocationAccess: (permissions: string[]) => Promise<boolean>;
+    addQueryToHistory: (query: string, response?: string) => Promise<void>;
 }
 
 // Enhanced logging function
@@ -368,6 +369,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
+    const addQueryToHistory = async (query: string, response?: string): Promise<void> => {
+        if (!user || !userProfile) {
+            log.warn('Cannot add query to history: No user or profile found');
+            return;
+        }
+
+        log.info('Adding query to user history:', { query, hasResponse: !!response });
+
+        try {
+            const newQueryRecord: QueryRecord = {
+                query,
+                timestamp: new Date(),
+                response
+            };
+
+            const updatedQueryHistory = [...(userProfile.queryHistory || []), newQueryRecord];
+            
+            // Keep only the last 50 queries to prevent the array from growing too large
+            const trimmedQueryHistory = updatedQueryHistory.slice(-50);
+
+            const updatedProfile: EPLQUserProfiles = {
+                ...userProfile,
+                queryHistory: trimmedQueryHistory,
+                updatedAt: new Date()
+            };
+
+            const userDocRef = doc(db, 'userProfiles', user.uid);
+            
+            log.info('Saving query to user profile in Firestore...');
+            await updateDoc(userDocRef, {
+                queryHistory: trimmedQueryHistory,
+                updatedAt: new Date()
+            });
+            
+            setUserProfile(updatedProfile);
+            log.success('Query added to user history successfully');
+        } catch (error) {
+            log.error('Error adding query to history:', error);
+            // Don't throw error for query history failures - it's not critical
+        }
+    };
+
     // Provide context value
     const contextValue: EPLQAuthContextType = {
         user,
@@ -378,6 +421,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logout,
         updateUserProfile,
         requestLocationAccess,
+        addQueryToHistory,
     };
 
     return (

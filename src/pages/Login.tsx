@@ -58,7 +58,7 @@ export const LoginPage: React.FC = () => {
 
     return (
         <Layout title="Login - EPLQ">
-            <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 flex items-center justify-center px-4 py-12 relative overflow-hidden">
+            <div className="flex-1 bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 px-4 py-12 relative overflow-hidden flex items-center justify-center">
                 {/* Background decorative elements */}
                 <div className="absolute top-20 left-20 w-40 h-40 bg-emerald-200/30 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-20 right-20 w-60 h-60 bg-blue-200/30 rounded-full blur-3xl"></div>

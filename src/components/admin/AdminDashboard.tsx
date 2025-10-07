@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import { useToast } from '../Toast';
+import { logger } from '../../utils/logger';
 import DataUpload from './DataUpload';
 import UserManagement from './UserManagement';
 import SystemStats from './SystemStats';
 import EncryptedDataViewer from './EncryptedDataViewer';
 import AdminSettings from './AdminSettings';
-import AdminRoleManagement from './AdminRoleManagement';
 
 interface AdminStats {
     totalUsers: number;
@@ -18,7 +20,9 @@ interface AdminStats {
 
 const AdminDashboard: React.FC = () => {
     const { userProfile, logout } = useAuth();
-    const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'roles' | 'data' | 'upload' | 'settings'>('overview');
+    const navigate = useNavigate();
+    const { addToast } = useToast();
+    const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'data' | 'upload' | 'settings'>('overview');
     const [stats, setStats] = useState<AdminStats>({
         totalUsers: 0,
         totalQueries: 0,
@@ -26,6 +30,25 @@ const AdminDashboard: React.FC = () => {
         activeUsers: 0
     });
     const [loading, setLoading] = useState(true);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+    const handleLogout = async () => {
+        try {
+            setIsLoggingOut(true);
+            await logout();
+            navigate('/');
+        } catch (error) {
+            logger.error('AdminDashboard', 'Logout failed', error as Error);
+            addToast({
+                type: 'error',
+                title: 'Logout Failed',
+                message: 'Please try again.',
+                duration: 4000
+            });
+        } finally {
+            setIsLoggingOut(false);
+        }
+    };
 
     useEffect(() => {
         if (userProfile?.role !== 'admin') {
@@ -106,31 +129,39 @@ const AdminDashboard: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="flex-1 flex flex-col bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 relative overflow-hidden">
+            {/* Background decorative elements */}
+            <div className="absolute top-10 left-10 w-60 h-60 bg-emerald-200/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-10 right-10 w-80 h-80 bg-blue-200/20 rounded-full blur-3xl"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-200/10 rounded-full blur-3xl"></div>
+            
             {/* Header */}
-            <header className="bg-white shadow-sm border-b">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <header className="relative z-10 bg-white/80 backdrop-blur-lg border-b-2 border-black shadow-[0_4px_0px_0px_rgba(0,0,0,1)]">
+                <div className="w-full px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center py-4">
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900">EPLQ Admin Dashboard</h1>
-                            <p className="text-sm text-gray-500">Privacy-Preserving Location Query Management System</p>
+                            <h1 className="text-2xl lg:text-3xl font-black text-gray-900">EPLQ Admin Dashboard</h1>
+                            <p className="text-sm text-gray-600 font-semibold">Privacy-Preserving Location Query Management System</p>
                         </div>
                         <div className="flex items-center space-x-4">
                             <div className="text-right">
-                                <p className="text-sm font-medium text-gray-700">
+                                <p className="text-sm font-black text-gray-700">
                                     Welcome, {userProfile?.displayName || userProfile?.email}
                                 </p>
-                                <p className="text-xs text-gray-500">Administrator</p>
+                                <p className="text-xs text-gray-500 font-semibold">Administrator</p>
                             </div>
-                            <div className="h-8 w-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
-                                {(userProfile?.displayName?.[0] || userProfile?.email?.[0] || 'A').toUpperCase()}
+                            <div className="h-10 w-10 bg-white rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center">
+                                <span className="text-black text-sm font-black">
+                                    {(userProfile?.displayName?.[0] || userProfile?.email?.[0] || 'A').toUpperCase()}
+                                </span>
                             </div>
                             <button
-                                onClick={logout}
-                                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors flex items-center"
+                                onClick={handleLogout}
+                                disabled={isLoggingOut}
+                                className={`bg-red-500 text-white px-4 py-2 rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:bg-red-600 transition-all duration-200 font-black text-sm uppercase tracking-wide flex items-center ${isLoggingOut ? 'opacity-70 cursor-not-allowed' : ''}`}
                             >
                                 <span className="mr-2">🚪</span>
-                                Logout
+                                {isLoggingOut ? 'Logging out...' : 'Logout'}
                             </button>
                         </div>
                     </div>
@@ -138,34 +169,29 @@ const AdminDashboard: React.FC = () => {
             </header>
 
             {/* Navigation Tabs */}
-            <nav className="bg-white border-b shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex space-x-8">
+            <nav className="relative z-10 bg-white/80 backdrop-blur-lg border-b-2 border-black shadow-[0_4px_0px_0px_rgba(0,0,0,1)]">
+                <div className="w-full px-4 sm:px-6 lg:px-8">
+                    <div className="flex flex-wrap justify-center gap-4 py-4">
                         {[
-                            { id: 'overview', label: 'Overview', icon: '📊', description: 'System statistics' },
-                            { id: 'users', label: 'User Management', icon: '👥', description: 'Manage users' },
-                            { id: 'roles', label: 'Role Management', icon: '🔑', description: 'Admin privileges' },
-                            { id: 'data', label: 'Data Viewer', icon: '🔒', description: 'View encrypted data' },
-                            { id: 'upload', label: 'Upload POIs', icon: '📤', description: 'Upload POI data' },
-                            { id: 'settings', label: 'Settings', icon: '⚙️', description: 'System configuration' }
+                            { id: 'overview', label: 'Overview', icon: '📊' },
+                            { id: 'users', label: 'User Management', icon: '👥' },
+                            { id: 'data', label: 'Data Viewer', icon: '🔒' },
+                            { id: 'upload', label: 'Upload POIs', icon: '📤' },
+                            { id: 'settings', label: 'Settings', icon: '⚙️' }
                         ].map((tab) => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as 'overview' | 'users' | 'data' | 'upload' | 'settings')}
-                                className={`group py-4 px-2 border-b-2 font-medium text-sm transition-colors relative ${
-                                    activeTab === tab.id
-                                        ? 'border-blue-500 text-blue-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                className={`px-6 py-3 font-black text-sm uppercase tracking-wide border-2 border-black rounded-lg transition-all duration-200 ${
+                                    activeTab === tab.id 
+                                    ? 'bg-emerald-400 hover:bg-emerald-300 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]'
+                                    : 'bg-white text-gray-700 hover:bg-emerald-100 hover:text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
                                 }`}
                             >
-                                <div className="flex items-center">
-                                    <span className="mr-2 text-lg">{tab.icon}</span>
+                                <span className="flex items-center space-x-2">
+                                    <span>{tab.icon}</span>
                                     <span>{tab.label}</span>
-                                </div>
-                                {/* Tooltip */}
-                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                                    {tab.description}
-                                </div>
+                                </span>
                             </button>
                         ))}
                     </div>
@@ -173,7 +199,7 @@ const AdminDashboard: React.FC = () => {
             </nav>
 
             {/* Main Content */}
-            <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <main className="flex-1 relative z-10 py-6 px-4 sm:px-6 lg:px-8 w-full">
                 {loading && activeTab === 'overview' ? (
                     <div className="flex justify-center items-center h-64">
                         <div className="text-center">
@@ -187,7 +213,6 @@ const AdminDashboard: React.FC = () => {
                             <SystemStats stats={stats} onRefresh={loadAdminStats} />
                         )}
                         {activeTab === 'users' && <UserManagement />}
-                        {activeTab === 'roles' && <AdminRoleManagement />}
                         {activeTab === 'data' && <EncryptedDataViewer />}
                         {activeTab === 'upload' && <DataUpload onUploadSuccess={loadAdminStats} />}
                         {activeTab === 'settings' && <AdminSettings />}
@@ -196,9 +221,9 @@ const AdminDashboard: React.FC = () => {
             </main>
 
             {/* Footer */}
-            <footer className="bg-white border-t mt-12">
-                <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center text-sm text-gray-500">
+            <footer className="relative z-10 bg-white/80 backdrop-blur-lg border-t-2 border-black shadow-[0_-4px_0px_0px_rgba(0,0,0,1)] mt-12">
+                <div className="w-full py-4 px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between items-center text-sm text-gray-600 font-semibold">
                         <div>
                             <p>&copy; 2025 EPLQ - Privacy-Preserving Location-Based Queries</p>
                         </div>

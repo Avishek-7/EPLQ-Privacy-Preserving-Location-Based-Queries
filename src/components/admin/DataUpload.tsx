@@ -3,6 +3,7 @@ import { collection, writeBatch, doc, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { eplqCrypto, type POIData } from '../../lib/encryption/eplq-crypto';
 import { logger } from '../../utils/logger';
+import { BrutalistButton } from '../ui';
 
 interface DataUploadProps {
     onUploadSuccess: () => void;
@@ -327,56 +328,64 @@ City Park,recreation,25.6230,85.1630,Beautiful public park with gardens`;
         <div className="space-y-6">
             {/* Header */}
             <div>
-                <h2 className="text-3xl font-bold text-grey-900">POI Data Upload</h2>
-                <p className="text-grey-600">
+                <h2 className="text-3xl font-black text-gray-900 mb-2">📤 POI Data Upload</h2>
+                <p className="text-gray-600 font-semibold">
                     Upload Points of Interest data with automatic privacy-preserving encryption
                 </p>
             </div>
             {/* Upload Instruction */}
-            <div className="bg-blue-50 border-blue-200 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-blue-900 mb-3">Upload Instructions</h3>
-                <ul className="space-y-2 text-blue-800">
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6">
+                <h3 className="text-lg font-black text-blue-900 mb-3">📋 Upload Instructions</h3>
+                <ul className="space-y-2 text-blue-800 font-semibold">
                     <li>1. Upload CSV files with POI data</li>
                     <li>2. Required columns: name, category, latitude, longitude</li>
                     <li>3. Optional: description column</li>
                     <li>4. Data will be automatically encrypted using EPLQ algorithm</li>
                     <li>5. Spatial indexing will be applied for privacy-preserving queries</li>
                 </ul>
-                <button
-                    onClick={downloadSampleCSV}
-                    className="mt-4 mr-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                    📥 Download Sample CSV
-                </button>
-                <button
-                    onClick={uploadSampleData}
-                    disabled={uploading || !cryptoInitialized}
-                    className="mt-4 mr-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                >
-                    🚀 Upload Sample Data Now
-                </button>
-                <button
-                    onClick={clearAllPOIData}
-                    disabled={uploading || !cryptoInitialized}
-                    className="mt-4 mr-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                >
-                    🗑️ Clear All POI Data
-                </button>
-                <button
-                    onClick={resetEncryptionKeys}
-                    disabled={uploading}
-                    className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                >
-                    🔄 Reset Encryption Keys
-                </button>
+                <div className="flex flex-wrap gap-4 mt-4">
+                    <BrutalistButton
+                        onClick={downloadSampleCSV}
+                        variant="secondary"
+                        size="sm"
+                    >
+                        📥 Download Sample CSV
+                    </BrutalistButton>
+                    <BrutalistButton
+                        onClick={uploadSampleData}
+                        disabled={uploading || !cryptoInitialized}
+                        variant="primary"
+                        size="sm"
+                    >
+                        🚀 Upload Sample Data Now
+                    </BrutalistButton>
+                    <BrutalistButton
+                        onClick={clearAllPOIData}
+                        disabled={uploading || !cryptoInitialized}
+                        variant="secondary"
+                        size="sm"
+                        className="bg-red-500 hover:bg-red-600 text-white border-red-600"
+                    >
+                        🗑️ Clear All POI Data
+                    </BrutalistButton>
+                    <BrutalistButton
+                        onClick={resetEncryptionKeys}
+                        disabled={uploading}
+                        variant="secondary"
+                        size="sm"
+                        className="bg-purple-500 hover:bg-purple-600 text-white border-purple-600"
+                    >
+                        🔄 Reset Encryption Keys
+                    </BrutalistButton>
+                </div>
             </div>
 
             {/* Upload Area */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+            <div className="bg-white rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6">
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center">
                     <div className="text-4xl mb-4">📂</div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Upload POI Data</h3>
-                    <p className="text-gray-600 mb-4">
+                    <h3 className="text-lg font-black text-gray-900 mb-2">📂 Upload POI Data</h3>
+                    <p className="text-gray-600 mb-4 font-semibold">
                         Choose a CSV file containing your Points of Interest data
                     </p>
 
@@ -457,7 +466,7 @@ City Park,recreation,25.6230,85.1630,Beautiful public park with gardens`;
                 </div>
                 
                 {/* Crypto Status */}
-                <div className={`mt-4 p-3 rounded-lg border ${
+                <div className={`mt-4 p-3 rounded-xl border-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
                     cryptoInitialized 
                         ? 'bg-green-50 border-green-200' 
                         : 'bg-yellow-50 border-yellow-200'
@@ -466,7 +475,7 @@ City Park,recreation,25.6230,85.1630,Beautiful public park with gardens`;
                         <span className={cryptoInitialized ? 'text-green-500' : 'text-yellow-500'}>
                             {cryptoInitialized ? '✅' : '⏳'}
                         </span>
-                        <span className={`text-sm font-semibold ${
+                        <span className={`text-sm font-black ${
                             cryptoInitialized ? 'text-green-800' : 'text-yellow-800'
                         }`}>
                             EPLQ Crypto System: {cryptoInitialized ? 'Ready' : 'Initializing...'}

@@ -125,7 +125,7 @@ export const RegisterPage: React.FC = () => {
 
     return (
         <Layout title="Register - EPLQ">
-            <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 flex items-center justify-center py-8 sm:py-12 sm:px-6 lg:px-8">
+            <div className="flex-1 bg-gradient-to-br from-emerald-50 via-blue-50 to-purple-50 relative overflow-hidden flex items-center justify-center py-8 sm:py-12 sm:px-6 lg:px-8">
                 {/* Background decorative elements */}
                 <div className="absolute top-20 right-20 w-40 h-40 bg-blue-200/30 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-20 left-20 w-60 h-60 bg-emerald-200/30 rounded-full blur-3xl"></div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrutalistButton } from '../ui';
 
 interface SystemStatsProps {
     stats: {
@@ -41,71 +42,74 @@ const SystemStats: React.FC<SystemStatsProps> = ({ stats, onRefresh }) => {
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
-                <h2 className="text-3xl font-bold text-gray-900">System Overview</h2>
-                <button
+                <div>
+                    <h2 className="text-3xl font-black text-gray-900 mb-2">📊 System Overview</h2>
+                    <p className="text-gray-600 font-semibold">Real-time system statistics and performance metrics</p>
+                </div>
+                <BrutalistButton
                     onClick={onRefresh}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center"
+                    variant="secondary"
+                    size="sm"
                 >
-                    <span className="mr-2">🔄</span>
-                    Refresh
-                </button>
+                    🔄 Refresh
+                </BrutalistButton>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {statCards.map((card, index) => (
-                    <div key={index} className="bg-white rounded-lg shadow-md p-6">
+                    <div key={index} className="bg-white rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6">
                         <div className="flex items-center">
-                            <div className={`${card.color} rounded-full p-3 text-white text-2xl mr-4`}>
+                            <div className={`${card.color} rounded-xl p-3 text-white text-2xl mr-4 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}>
                                 {card.icon}
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-gray-600">{card.title}</p>
-                                <p className="text-3xl font-bold text-gray-900">{card.value.toLocaleString()}</p>
+                                <p className="text-sm font-black text-gray-600 uppercase tracking-wide">{card.title}</p>
+                                <p className="text-3xl font-black text-gray-900">{card.value.toLocaleString()}</p>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">🔐 Privacy & Security Status</h3>
+            <div className="bg-white rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6">
+                <h3 className="text-xl font-black text-gray-900 mb-4">🔐 Privacy & Security Status</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <div className="text-center p-4 bg-green-50 rounded-xl border-2 border-green-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                         <div className="text-2xl text-green-600 mb-2">✅</div>
-                        <p className="font-semibold text-green-800">Encryption Active</p>
-                        <p className="text-sm text-green-600">All data encrypted</p>
+                        <p className="font-black text-green-800">Encryption Active</p>
+                        <p className="text-sm text-green-600 font-semibold">All data encrypted</p>
                     </div>
-                    <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <div className="text-center p-4 bg-blue-50 rounded-xl border-2 border-blue-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                         <div className="text-2xl text-blue-600 mb-2">🛡️</div>
-                        <p className="font-semibold text-blue-800">Privacy Preserved</p>
-                        <p className="text-sm text-blue-600">Zero location exposure</p>
+                        <p className="font-black text-blue-800">Privacy Preserved</p>
+                        <p className="text-sm text-blue-600 font-semibold">Zero location exposure</p>
                     </div>
-                    <div className="text-center p-4 bg-purple-50 rounded-lg">
+                    <div className="text-center p-4 bg-purple-50 rounded-xl border-2 border-purple-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                         <div className="text-2xl text-purple-600 mb-2">⚡</div>
-                        <p className="font-semibold text-purple-800">Performance</p>
-                        <p className="text-sm text-purple-600">~0.9s query generation</p>
+                        <p className="font-black text-purple-800">Performance</p>
+                        <p className="text-sm text-purple-600 font-semibold">~0.9s query generation</p>
                     </div>
                 </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">📈 System Performance</h3>
+            <div className="bg-white rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6">
+                <h3 className="text-xl font-black text-gray-900 mb-4">📈 System Performance</h3>
                 <div className="space-y-4">
-                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                        <span className="font-medium">Average Query Time</span>
-                        <span className="text-green-600 font-bold">0.92s</span>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl border-2 border-gray-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <span className="font-black">Average Query Time</span>
+                        <span className="text-green-600 font-black">0.92s</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                        <span className="font-medium">POI Search Latency</span>
-                        <span className="text-green-600 font-bold">2.1s</span>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl border-2 border-gray-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <span className="font-black">POI Search Latency</span>
+                        <span className="text-green-600 font-black">2.1s</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                        <span className="font-medium">System Uptime</span>
-                        <span className="text-green-600 font-bold">99.9%</span>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl border-2 border-gray-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <span className="font-black">System Uptime</span>
+                        <span className="text-green-600 font-black">99.9%</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                        <span className="font-medium">Privacy Level</span>
-                        <span className="text-green-600 font-bold">Maximum</span>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl border-2 border-gray-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <span className="font-black">Privacy Level</span>
+                        <span className="text-green-600 font-black">Maximum</span>
                     </div>
                 </div>
             </div>
