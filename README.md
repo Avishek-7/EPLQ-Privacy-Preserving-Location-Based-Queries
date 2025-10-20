@@ -5,10 +5,13 @@
 ![React](https://img.shields.io/badge/React-19.1.1-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.6.2-blue)
 
+🌐 **Live Demo**: [https://eplq-cdfe1.web.app](https://eplq-cdfe1.web.app)
+
 ## 📋 Table of Contents
 - [Overview](#-overview)
 - [Problem Statement](#-problem-statement)
 - [Features](#-features)
+- [Screenshots](#-screenshots)
 - [System Architecture](#-system-architecture)
 - [Technologies Used](#-technologies-used)
 - [Installation & Setup](#-installation--setup)
@@ -57,6 +60,50 @@ With the widespread adoption of smartphones, Location-Based Services (LBS) have 
 - **Query History**: Encrypted query history tracking
 - **Privacy Controls**: Granular privacy preference settings
 - **Data Export**: Personal data export functionality
+
+## 📸 Screenshots
+
+### User Registration
+![Registration](./docs/screenshots/register.png)
+*User registration with privacy level selection*
+
+### User Login
+![Login](./docs/screenshots/login.png)
+*Secure authentication interface*
+
+### Admin Dashboard
+![Admin Dashboard](./docs/screenshots/admin%20dashboard.png)
+*Administrator control panel with system statistics*
+
+### System Performance Metrics
+![System Performance](./docs/screenshots/Screenshot%202025-10-20%20at%206.27.12%20PM.png)
+*Real-time performance monitoring and analytics*
+
+### POI Data Upload
+![Data Upload](./docs/screenshots/poi%20data%20upload%20page.png)
+*Admin interface for uploading encrypted POI data*
+
+### User Management
+![User Management](./docs/screenshots/user%20management%20page.png)
+*Admin interface for managing system users and roles*
+
+### User Dashboard
+![User Dashboard](./docs/screenshots/user%20dashboard.png)
+*User control panel with privacy settings and query history*
+
+### POI Search Interface
+![POI Search](./docs/screenshots/Privacy-Preserving%20POI%20Search%20page.png)
+*Privacy-preserving location-based search interface*
+
+### Search Results & Additional Views
+![Screenshot 1](./docs/screenshots/Screenshot%202025-10-20%20at%206.20.27%20PM.png)
+*System overview and navigation*
+
+![Screenshot 2](./docs/screenshots/Screenshot%202025-10-20%20at%206.21.07%20PM.png)
+*Detailed system view*
+
+![Screenshot 3](./docs/screenshots/Screenshot%202025-10-20%20at%206.21.38%20PM.png)
+*Additional system features*
 
 ## 🏗️ System Architecture
 
@@ -294,7 +341,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Project Status**: ✅ Active Development
-**Last Updated**: January 2025
+**Last Updated**: October 2025
 **Version**: 1.0.0
 
 For questions or support, please open an issue on GitHub.

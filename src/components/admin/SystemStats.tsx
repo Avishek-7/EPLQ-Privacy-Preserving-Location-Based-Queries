@@ -95,21 +95,21 @@ const SystemStats: React.FC<SystemStatsProps> = ({ stats, onRefresh }) => {
             <div className="bg-white rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6">
                 <h3 className="text-xl font-black text-gray-900 mb-4">📈 System Performance</h3>
                 <div className="space-y-4">
-                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl border-2 border-gray-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                        <span className="font-black">Average Query Time</span>
-                        <span className="text-green-600 font-black">0.92s</span>
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-4 bg-gray-50 rounded-xl border-2 border-gray-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <span className="font-black text-gray-800 text-sm sm:text-base">Average Query Time</span>
+                        <span className="text-green-600 font-black text-lg sm:text-xl">0.92s</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl border-2 border-gray-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                        <span className="font-black">POI Search Latency</span>
-                        <span className="text-green-600 font-black">2.1s</span>
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-4 bg-gray-50 rounded-xl border-2 border-gray-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <span className="font-black text-gray-800 text-sm sm:text-base">POI Search Latency</span>
+                        <span className="text-green-600 font-black text-lg sm:text-xl">2.1s</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl border-2 border-gray-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                        <span className="font-black">System Uptime</span>
-                        <span className="text-green-600 font-black">99.9%</span>
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-4 bg-gray-50 rounded-xl border-2 border-gray-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <span className="font-black text-gray-800 text-sm sm:text-base">System Uptime</span>
+                        <span className="text-green-600 font-black text-lg sm:text-xl">99.9%</span>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl border-2 border-gray-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                        <span className="font-black">Privacy Level</span>
-                        <span className="text-green-600 font-black">Maximum</span>
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-4 bg-gray-50 rounded-xl border-2 border-gray-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <span className="font-black text-gray-800 text-sm sm:text-base">Privacy Level</span>
+                        <span className="text-green-600 font-black text-lg sm:text-xl">Maximum</span>
                     </div>
                 </div>
             </div>
